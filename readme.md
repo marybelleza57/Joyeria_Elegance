@@ -61,33 +61,35 @@ Aplicación web para tienda de joyas con catálogo, pedidos, devoluciones, notas
 
 ---
 
-## Estructura del proyecto
+## Estructura del Proyecto
+
+```
 elegance/
 ├── src/
-│ ├── main/
-│ │ ├── java/com/joyas/elegance/
-│ │ │ ├── config/ # Configuraciones (Security, Interceptor)
-│ │ │ ├── controller/ # Controladores MVC
-│ │ │ ├── model/ # Entidades JPA
-│ │ │ ├── repository/ # Repositorios Spring Data JPA
-│ │ │ └── service/ # Servicios (Email, Cloudinary)
-│ │ └── resources/
-│ │ ├── static/ # CSS, JS, imágenes
-│ │ │ ├── css/
-│ │ │ ├── js/
-│ │ │ └── images/
-│ │ ├── templates/ # Plantillas Thymeleaf
-│ │ │ ├── admin/
-│ │ │ ├── cliente/
-│ │ │ └── fragments/
-│ │ └── application.properties
-│ └── test/ # Pruebas unitarias
+│   ├── main/
+│   │   ├── java/com/joyas/elegance/
+│   │   │   ├── config/              # Configuraciones (Security, Interceptor)
+│   │   │   ├── controller/          # Controladores MVC
+│   │   │   ├── model/               # Entidades JPA
+│   │   │   ├── repository/          # Repositorios Spring Data JPA
+│   │   │   └── service/             # Servicios (Email, Cloudinary)
+│   │   └── resources/
+│   │       ├── static/
+│   │       │   ├── css/             # Hojas de estilo
+│   │       │   ├── js/              # JavaScript
+│   │       │   └── images/          # Imagenes estaticas
+│   │       ├── templates/
+│   │       │   ├── admin/           # Plantillas panel administrador
+│   │       │   ├── cliente/         # Plantillas modulo cliente
+│   │       │   └── fragments/       # Fragmentos reutilizables
+│   │       └── application.properties
+│   └── test/                        # Pruebas unitarias
 ├── Base de datos/
-│ └── Joyería_elegante_producción.sql
-├── .env # Variables de entorno
-├── pom.xml # Dependencias Maven
-└── README.md # Este archivo
-
+│   └── Joyeria_elegante_produccion.sql
+├── .env                             # Variables de entorno
+├── pom.xml                          # Dependencias Maven
+└── README.md                        # Este archivo
+```
 ---
 
 ## Requisitos previos
@@ -276,6 +278,37 @@ mvn clean spring-boot:run
 | Cliente | `jonine7015@dysonc.com` | `123456789` |
 
 ---
+## 🐳 Despliegue con Docker
+
+### Requisitos previos
+
+| Software | Descripción |
+|----------|-------------|
+| **Docker Desktop** | Necesario para construir y ejecutar la imagen Docker |
+| **Docker Engine** | Motor de contenedores (incluido en Docker Desktop) |
+
+**Descargar Docker Desktop:** https://www.docker.com/products/docker-desktop/
+
+---
+
+### Construir la imagen Docker
+
+```bash
+# Navegar a la raíz del proyecto
+cd C:\Users\Jordy\Documents\proyectos\elegance
+```
+# Construir la imagen
+
+```bash
+docker build -t joyas-elegance .
+```
+
+### Ejecutar el contenedor
+
+```bash
+# Ejecutar con variables de entorno desde .env
+docker run --name joyas-elegance -d -p 8080:8080 --env-file .env joyas-elegance:latest
+```
 
 ## Características principales
 
