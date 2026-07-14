@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Gestión de Usuarios', links=~{::link})}">
+    <!-- Simple DataTables CSS -->
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.0.8/datatables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" rel="stylesheet">
+    <!-- Admin Custom CSS -->
+    <link th:href="@{/css/admin.css?v=10}" rel="stylesheet" type="text/css">
+</head>
+
+<body style="font-family: 'Inter', sans-serif; background-color: var(--color-claro);">
+
+    <nav th:replace="~{fragments/admin-components :: topbar}"></nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <nav th:replace="~{fragments/admin-components :: sidebar(activeTab='usuarios')}"></nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="admin-page-title">Gestión de Usuarios</h2>
+                    <button class="btn btn-principal text-uppercase fw-bold rounded-pill px-4 text-white"
+                        onclick="abrirModalNuevo()"><i class="fas fa-plus me-2"></i> Nuevo Usuario</button>
+                </div>
+
+                <!-- Alertas de Éxito / Error -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 mb-4"
+                    role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Error</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show rounded-3 mb-4"
+                    role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <span th:text="${success}">Operación exitosa</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4">
+                        <table class="table table-hover align-middle mb-0 datatable" id="tabla-usuarios">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 px-4 border-0">Usuario</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Email</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Teléfono</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Rol</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Estado</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 text-end px-4 border-0">
+                                        Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="usr : ${usuarios}">
+                                    <td class="fw-bold text-dark px-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3 d-flex align-items-center justify-content-center text-white bg-dark fw-bold"
+                                                style="width: 38px; height: 38px; border-radius: 50%;"
+                                                th:text="${#strings.substring(usr.nombre,0,1).toUpperCase()}">U</div>
+                                            <div>
+                                                <span
+                                                    th:text="${usr.nombre + (usr.apellidos != null ? ' ' + usr.apellidos : '')}">Nombre
+                                                    Completo</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted" th:text="${usr.correo}">correo@joyaselegance.com</td>
+                                    <td class="text-muted" th:text="${usr.telefono != null ? usr.telefono : '—'}">
+                                        987654321</td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-1.5 small fw-semibold"
+                                            th:style="${usr.rol != null && ('Administrador'.equalsIgnoreCase(usr.rol.nombre) || 'ADMIN'.equalsIgnoreCase(usr.rol.nombre)) ? 'background-color: rgba(211, 175, 55, 0.15); color: #D3AF37; border: 1px solid #D3AF37;' : 'background-color: rgba(108, 117, 125, 0.1); color: #6c757d; border: 1px solid #6c757d;'}"
+                                            th:text="${usr.rol != null ? usr.rol.nombre : 'Sin Rol'}">Rol</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill px-3 py-1.5 small fw-semibold"
+                                            th:classappend="${'ACTIVO'.equalsIgnoreCase(usr.estado) ? 'bg-success-subtle text-success border border-success' : 'bg-danger-subtle text-danger border border-danger'}"
+                                            th:text="${usr.estado != null ? usr.estado : 'INACTIVO'}">ACTIVO</span>
+                                    </td>
+                                    <td class="text-end px-4">
+                                        <button class="btn btn-sm btn-outline-dark rounded-3 me-1" title="Modificar"
+                                            th:data-id="${usr.id}" th:data-nombre="${usr.nombre}"
+                                            th:data-apellidos="${usr.apellidos}" th:data-email="${usr.correo}"
+                                            th:data-telefono="${usr.telefono}"
+                                            th:data-rol-id="${usr.rol != null ? usr.rol.id : ''}"
+                                            th:data-estado="${usr.estado}" onclick="abrirModalEditar(this)"><i
+                                                class="fas fa-edit"></i></button>
+
+                                        <!-- Botón Eliminar: Deshabilitado si es el administrador logueado -->
+                                        <a th:if="${session.adminLogueado == null || !session.adminLogueado.id.equals(usr.id)}"
+                                            th:href="@{/admin/usuarios/eliminar/{id}(id=${usr.id})}"
+                                            class="btn btn-sm btn-outline-danger rounded-3" title="Eliminar"
+                                            onclick="return confirm('¿Está seguro de que desea eliminar este usuario?')"><i
+                                                class="fas fa-trash-alt"></i></a>
+                                        <button
+                                            th:if="${session.adminLogueado != null && session.adminLogueado.id.equals(usr.id)}"
+                                            class="btn btn-sm btn-outline-secondary rounded-3 disabled"
+                                            title="No puedes eliminar tu propia cuenta" disabled><i
+                                                class="fas fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Usuario -->
+    <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-uppercase" id="modalUsuarioTitle"
+                        style="font-family: 'Outfit', sans-serif;">Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/usuarios/guardar}" method="post">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="id" id="usrId">
+
+                        <div class="row g-3">
+                            <div class="col-md-6 col-12">
+                                <label class="form-label fw-semibold small mb-1">Nombre</label>
+                                <input type="text" name="nombre" id="usrNombre" class="form-control rounded-3" required>
+                            </div>
+
+                            <div class="col-md-6 col-12">
+                                <label class="form-label fw-semibold small mb-1">Apellidos</label>
+                                <input type="text" name="apellidos" id="usrApellidos" class="form-control rounded-3">
+                            </div>
+
+                            <div class="col-md-6 col-12">
+                                <label class="form-label fw-semibold small mb-1">Email</label>
+                                <input type="email" name="correo" id="usrEmail" class="form-control rounded-3" required>
+                            </div>
+
+                            <div class="col-md-6 col-12">
+                                <label class="form-label fw-semibold small mb-1">Teléfono</label>
+                                <input type="tel" name="telefono" id="usrTelefono" class="form-control rounded-3"
+                                    required pattern="9[0-9]{8}" maxlength="9"
+                                    title="El teléfono debe comenzar con 9 y tener exactamente 9 dígitos"
+                                    placeholder="987654321">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small mb-1" id="labelContrasena">Contraseña</label>
+                                <div class="input-group">
+                                    <input type="password" name="contrasenaPlana" id="usrContrasena"
+                                        class="form-control rounded-start-3" placeholder="••••••••">
+                                    <button class="btn btn-outline-secondary rounded-end-3 px-3" type="button"
+                                        id="btnToggleContrasena">
+                                        <i class="fas fa-eye-slash" id="ojoIcono"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted d-none" id="helpContrasena">Deja este campo vacío si no deseas
+                                    cambiar la contraseña actual.</small>
+                            </div>
+
+                            <div class="col-md-6 col-12">
+                                <label class="form-label fw-semibold small mb-1">Rol</label>
+                                <select name="rol.id" id="usrRol" class="form-select rounded-3" required>
+                                    <option value="" disabled selected>Selecciona un rol</option>
+                                    <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre}">Rol</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 col-12">
+                                <label class="form-label fw-semibold small mb-1">Estado</label>
+                                <select name="estado" id="usrEstado" class="form-select rounded-3" required>
+                                    <option value="ACTIVO">ACTIVO</option>
+                                    <option value="INACTIVO">INACTIVO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pb-4 pe-4">
+                        <button type="button" class="btn btn-light rounded-3 px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="btnSubmitUsuario" class="btn btn-principal rounded-3 text-white px-4">Crear
+                            Usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/modales :: modales}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.0.8/datatables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.min.js"></script>
+    <script th:src="@{/js/admin.js?v=10}"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const adminLogueadoId = /*[[${session.adminLogueado != null ? session.adminLogueado.id.toString() : ''}]]*/ '';
+        /*]]>*/
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnToggle = document.getElementById('btnToggleContrasena');
+            const inputContrasena = document.getElementById('usrContrasena');
+            const ojoIcono = document.getElementById('ojoIcono');
+
+            btnToggle.addEventListener('click', function () {
+                if (inputContrasena.type === 'password') {
+                    inputContrasena.type = 'text';
+                    ojoIcono.classList.remove('fa-eye-slash');
+                    ojoIcono.classList.add('fa-eye');
+                } else {
+                    inputContrasena.type = 'password';
+                    ojoIcono.classList.remove('fa-eye');
+                    ojoIcono.classList.add('fa-eye-slash');
+                }
+            });
+        });
+
+        function abrirModalNuevo() {
+            document.getElementById('modalUsuarioTitle').innerText = 'Nuevo Usuario';
+            document.getElementById('btnSubmitUsuario').innerText = 'Crear Usuario';
+            document.getElementById('usrId').value = '';
+            document.getElementById('usrNombre').value = '';
+            document.getElementById('usrApellidos').value = '';
+            document.getElementById('usrEmail').value = '';
+            document.getElementById('usrTelefono').value = '';
+
+            const inputContrasena = document.getElementById('usrContrasena');
+            const ojoIcono = document.getElementById('ojoIcono');
+            inputContrasena.value = '';
+            inputContrasena.type = 'password';
+            inputContrasena.required = true;
+            ojoIcono.classList.remove('fa-eye');
+            ojoIcono.classList.add('fa-eye-slash');
+
+            document.getElementById('helpContrasena').classList.add('d-none');
+
+            const selectRol = document.getElementById('usrRol');
+            const selectEstado = document.getElementById('usrEstado');
+            selectRol.value = '';
+            selectRol.disabled = false;
+            selectEstado.value = 'ACTIVO';
+            selectEstado.disabled = false;
+
+            const warningDiv = document.getElementById('autoEditWarning');
+            if (warningDiv) {
+                warningDiv.remove();
+            }
+
+            new bootstrap.Modal(document.getElementById('modalUsuario')).show();
+        }
+
+        function abrirModalEditar(btn) {
+            document.getElementById('modalUsuarioTitle').innerText = 'Modificar Usuario';
+            document.getElementById('btnSubmitUsuario').innerText = 'Guardar Cambios';
+            const userId = btn.getAttribute('data-id');
+            document.getElementById('usrId').value = userId;
+            document.getElementById('usrNombre').value = btn.getAttribute('data-nombre');
+            document.getElementById('usrApellidos').value = btn.getAttribute('data-apellidos') || '';
+            document.getElementById('usrEmail').value = btn.getAttribute('data-email');
+            document.getElementById('usrTelefono').value = btn.getAttribute('data-telefono') || '';
+
+            const inputContrasena = document.getElementById('usrContrasena');
+            const ojoIcono = document.getElementById('ojoIcono');
+            inputContrasena.value = '';
+            inputContrasena.type = 'password';
+            inputContrasena.required = false;
+            ojoIcono.classList.remove('fa-eye');
+            ojoIcono.classList.add('fa-eye-slash');
+
+            document.getElementById('helpContrasena').classList.remove('d-none');
+
+            const selectRol = document.getElementById('usrRol');
+            const selectEstado = document.getElementById('usrEstado');
+
+            selectRol.value = btn.getAttribute('data-rol-id');
+            selectEstado.value = btn.getAttribute('data-estado') || 'ACTIVO';
+
+            // Regla de negocio: Si se edita a sí mismo, bloquear cambio de rol y estado
+            if (adminLogueadoId && userId === adminLogueadoId) {
+                selectRol.disabled = true;
+                selectEstado.disabled = true;
+
+                if (!document.getElementById('autoEditWarning')) {
+                    const warningDiv = document.createElement('div');
+                    warningDiv.id = 'autoEditWarning';
+                    warningDiv.className = 'alert alert-warning py-2 px-3 mb-3 small rounded-3';
+                    warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Los administradores con sesión activa no pueden cambiar su propio rol ni desactivar su cuenta.';
+                    // Insertar warning al inicio del cuerpo del modal
+                    const modalBody = document.querySelector('#modalUsuario .modal-body');
+                    modalBody.insertBefore(warningDiv, modalBody.firstChild);
+                }
+            } else {
+                selectRol.disabled = false;
+                selectEstado.disabled = false;
+                const warningDiv = document.getElementById('autoEditWarning');
+                if (warningDiv) {
+                    warningDiv.remove();
+                }
+            }
+
+            new bootstrap.Modal(document.getElementById('modalUsuario')).show();
+        }
+    </script>
+</body>
+
+</html>

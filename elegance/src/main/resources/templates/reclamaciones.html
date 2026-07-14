@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Libro de Reclamaciones', links=null)}"></head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar(active='inicio', tipo='publico')}"></div>
+
+    <main class="flex-grow-1 py-5">
+        <div class="container py-4" style="max-width: 850px;">
+
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-6 fw-bold text-uppercase" style="font-family: 'Outfit', sans-serif; letter-spacing: 2px;">Libro de Reclamaciones</h1>
+                <div class="divisor-columna mx-auto" style="width: 60px; height: 3px; background-color: var(--color-oro, #D3AF37);"></div>
+                <p class="text-muted mt-2">Conforme a lo establecido en el Código de Protección y Defensa del Consumidor de Perú.</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white mb-5" id="reclamacion-card">
+                <div class="card-header bg-dark text-white py-3 px-4 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-uppercase tracking-wider small" style="color: var(--color-oro, #D3AF37);">Hoja de Reclamación</span>
+                    <span class="badge bg-warning text-dark fw-bold" id="claim-number-badge">REC-2026-XXXXX</span>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- Alert Message -->
+                    <div id="reclamaciones-alerta" class="alert alert-danger d-none" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> <span id="reclamaciones-alerta-mensaje">Por favor complete todos los campos obligatorios.</span>
+                    </div>
+
+                    <form id="reclamacion-form" novalidate>
+                        <!-- SECCIÓN 1: IDENTIFICACIÓN DEL CONSUMIDOR -->
+                        <h5 class="border-bottom pb-2 mb-4 text-dark fw-bold text-uppercase" style="font-size: 1rem; letter-spacing: 1px;">
+                            <i class="fas fa-user text-gold me-2"></i> 1. Identificación del Consumidor Reclamante
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="nombres" class="form-label small fw-semibold text-dark">Nombres y Apellidos *</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="nombres" required placeholder="Ej. Juan Pérez">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="tipoDoc" class="form-label small fw-semibold text-dark">Tipo de Doc. *</label>
+                                <select class="form-select rounded-3 border-secondary-subtle" id="tipoDoc" required>
+                                    <option value="DNI">DNI</option>
+                                    <option value="CE">C.E.</option>
+                                    <option value="Pasaporte">Pasaporte</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="numDoc" class="form-label small fw-semibold text-dark">N° Documento *</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="numDoc" required placeholder="Ej. 70123456" maxlength="15">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label small fw-semibold text-dark">Correo Electrónico *</label>
+                                <input type="email" class="form-control rounded-3 border-secondary-subtle" id="email" required placeholder="juan.perez@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label small fw-semibold text-dark">Teléfono de Contacto *</label>
+                                <input type="tel" class="form-control rounded-3 border-secondary-subtle" id="telefono" required placeholder="Ej. 999123456" maxlength="9">
+                            </div>
+                            <div class="col-12">
+                                <label for="direccion" class="form-label small fw-semibold text-dark">Dirección de Domicilio *</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="direccion" required placeholder="Ej. Av. Larco 123 Dpto 402">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="departamento" class="form-label small fw-semibold text-dark">Departamento *</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="departamento" required placeholder="Ej. Lima">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="provincia" class="form-label small fw-semibold text-dark">Provincia *</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="provincia" required placeholder="Ej. Lima">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="distrito" class="form-label small fw-semibold text-dark">Distrito *</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="distrito" required placeholder="Ej. Miraflores">
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 2: IDENTIFICACIÓN DEL BIEN CONTRATADO -->
+                        <h5 class="border-bottom pb-2 mb-4 text-dark fw-bold text-uppercase" style="font-size: 1rem; letter-spacing: 1px;">
+                            <i class="fas fa-gem text-gold me-2"></i> 2. Identificación del Bien Contratado
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-dark d-block">Tipo de Bien *</label>
+                                <div class="form-check form-check-inline mt-1">
+                                    <input class="form-check-input" type="radio" name="tipoBien" id="bienProducto" value="Producto" checked>
+                                    <label class="form-check-label text-dark small" for="bienProducto" style="cursor: pointer;">Producto</label>
+                                </div>
+                                <div class="form-check form-check-inline mt-1">
+                                    <input class="form-check-input" type="radio" name="tipoBien" id="bienServicio" value="Servicio">
+                                    <label class="form-check-label text-dark small" for="bienServicio" style="cursor: pointer;">Servicio</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="montoBien" class="form-label small fw-semibold text-dark">Monto Reclamado (S/.) *</label>
+                                <input type="number" class="form-control rounded-3 border-secondary-subtle" id="montoBien" required placeholder="Ej. 1200.00" min="0" step="0.01">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="numPedido" class="form-label small fw-semibold text-dark">N° Pedido (Opcional)</label>
+                                <input type="text" class="form-control rounded-3 border-secondary-subtle" id="numPedido" placeholder="Ej. PE-000020">
+                            </div>
+                            <div class="col-12">
+                                <label for="descBien" class="form-label small fw-semibold text-dark">Descripción del Bien Contratado *</label>
+                                <textarea class="form-control rounded-3 border-secondary-subtle" id="descBien" rows="2" required placeholder="Ej. Anillo Aro de Plata Ley 925 adquirido en la tienda online."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 3: DETALLE DE LA RECLAMACIÓN -->
+                        <h5 class="border-bottom pb-2 mb-4 text-dark fw-bold text-uppercase" style="font-size: 1rem; letter-spacing: 1px;">
+                            <i class="fas fa-file-alt text-gold me-2"></i> 3. Detalle de la Reclamación y Pedido del Consumidor
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark d-block">Tipo *</label>
+                                <div class="form-check form-check-inline mt-1">
+                                    <input class="form-check-input" type="radio" name="tipoReclamacion" id="tipoReclamo" value="Reclamo" checked>
+                                    <label class="form-check-label text-dark small" for="tipoReclamo" style="cursor: pointer;">
+                                        <strong>Reclamo</strong> <span class="text-muted" style="font-size:0.75rem;">(Disconformidad con el producto/servicio)</span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline mt-1">
+                                    <input class="form-check-input" type="radio" name="tipoReclamacion" id="tipoQueja" value="Queja">
+                                    <label class="form-check-label text-dark small" for="tipoQueja" style="cursor: pointer;">
+                                        <strong>Queja</strong> <span class="text-muted" style="font-size:0.75rem;">(Malestar respecto a la atención)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="detalleReclamacion" class="form-label small fw-semibold text-dark">Detalle del Reclamo o Queja *</label>
+                                <textarea class="form-control rounded-3 border-secondary-subtle" id="detalleReclamacion" rows="4" required placeholder="Describa de la manera más clara y detallada posible lo sucedido con su compra o servicio..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label for="pedidoConsumidor" class="form-label small fw-semibold text-dark">Pedido Concreto del Consumidor *</label>
+                                <textarea class="form-control rounded-3 border-secondary-subtle" id="pedidoConsumidor" rows="3" required placeholder="Escriba concretamente qué solicita (ej. cambio de producto, Nota de crédito, disculpas formales, etc.)."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- DECLARACIÓN -->
+                        <div class="mb-4">
+                            <div class="form-check text-start">
+                                <input class="form-check-input border-secondary-subtle" type="checkbox" id="declaracionJurada" required>
+                                <label class="form-check-label text-muted small" for="declaracionJurada" style="cursor: pointer; line-height: 1.4;">
+                                    Declaro bajo juramento que los datos consignados en esta hoja de reclamación corresponden a la verdad y acepto que toda comunicación sea enviada a mi correo electrónico registrado.
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="d-flex justify-content-end gap-3 pt-3 border-top">
+                            <a href="/" class="btn btn-light rounded-3 px-4 fw-semibold">Cancelar</a>
+                            <button type="submit" class="btn btn-dark rounded-3 px-5 fw-semibold" style="background-color: var(--color-negro-premium, #0d0d0d); color: white;" id="btnEnviarReclamacion">
+                                Enviar Reclamación
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- SUCCESS STATE CARD (HIDDEN BY DEFAULT) -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white mb-5 d-none" id="success-card">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <span class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle" style="width: 80px; height: 80px;">
+                            <i class="fas fa-check-circle fa-3x"></i>
+                        </span>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-2">Reclamación Enviada con Éxito</h3>
+                    <p class="text-muted mx-auto mb-4" style="max-width: 550px;">
+                        Hemos registrado su hoja de reclamación bajo el código de seguimiento indicado abajo. Se ha enviado una copia firmada en formato digital a su correo electrónico.
+                    </p>
+                    
+                    <div class="bg-light p-4 rounded-3 text-start mb-4 mx-auto border border-secondary-subtle" style="max-width: 550px;">
+                        <div class="row g-2 small">
+                            <div class="col-5 text-muted fw-semibold">Código de Registro:</div>
+                            <div class="col-7 text-dark fw-bold" id="res-codigo">-</div>
+                            
+                            <div class="col-5 text-muted fw-semibold">Fecha de Emisión:</div>
+                            <div class="col-7 text-dark" id="res-fecha">-</div>
+
+                            <div class="col-5 text-muted fw-semibold">Reclamante:</div>
+                            <div class="col-7 text-dark" id="res-nombre">-</div>
+
+                            <div class="col-5 text-muted fw-semibold">Tipo de Bien:</div>
+                            <div class="col-7 text-dark" id="res-bien">-</div>
+
+                            <div class="col-5 text-muted fw-semibold">Tipo de Solicitud:</div>
+                            <div class="col-7 text-dark" id="res-tipo">-</div>
+
+                            <div class="col-5 text-muted fw-semibold">Monto Reclamado:</div>
+                            <div class="col-7 text-gold fw-bold" id="res-monto">-</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 border-start border-3 border-info bg-info-subtle rounded-end small text-muted text-start mb-4 mx-auto" style="max-width: 550px;">
+                        <i class="fas fa-info-circle text-info me-2"></i>
+                        Conforme a la normativa vigente del INDECOPI, daremos respuesta a su reclamación en un plazo no mayor a quince (15) días hábiles improrrogables.
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <button onclick="window.print()" class="btn btn-outline-dark rounded-3 px-4 fw-semibold">
+                            <i class="fas fa-print me-1"></i> Imprimir Hoja
+                        </button>
+                        <a href="/" class="btn btn-dark rounded-3 px-4 fw-semibold" style="background-color: var(--color-negro-premium, #0d0d0d); color: white;">
+                            Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Generar código aleatorio de reclamo
+            const randNum = Math.floor(10000 + Math.random() * 90000);
+            const claimCode = `REC-2026-${randNum}`;
+            document.getElementById('claim-number-badge').textContent = claimCode;
+
+            // Enviar formulario
+            const form = document.getElementById('reclamacion-form');
+            const alertContainer = document.getElementById('reclamaciones-alerta');
+            const alertMessage = document.getElementById('reclamaciones-alerta-mensaje');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                alertContainer.classList.add('d-none');
+
+                // Validaciones
+                const nombres = document.getElementById('nombres').value.trim();
+                const numDoc = document.getElementById('numDoc').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const telefono = document.getElementById('telefono').value.trim();
+                const direccion = document.getElementById('direccion').value.trim();
+                const departamento = document.getElementById('departamento').value.trim();
+                const provincia = document.getElementById('provincia').value.trim();
+                const distrito = document.getElementById('distrito').value.trim();
+                const montoBien = document.getElementById('montoBien').value.trim();
+                const descBien = document.getElementById('descBien').value.trim();
+                const detalleReclamacion = document.getElementById('detalleReclamacion').value.trim();
+                const pedidoConsumidor = document.getElementById('pedidoConsumidor').value.trim();
+                const declaracion = document.getElementById('declaracionJurada').checked;
+
+                if (!nombres || !numDoc || !email || !telefono || !direccion || !departamento || !provincia || !distrito || !montoBien || !descBien || !detalleReclamacion || !pedidoConsumidor) {
+                    alertMessage.textContent = "Por favor, complete todos los campos obligatorios (*).";
+                    alertContainer.classList.remove('d-none');
+                    window.scrollTo({ top: alertContainer.offsetTop - 100, behavior: 'smooth' });
+                    return;
+                }
+
+                if (!declaracion) {
+                    alertMessage.textContent = "Debe declarar bajo juramento la veracidad de los datos marcando la casilla de aceptación.";
+                    alertContainer.classList.remove('d-none');
+                    return;
+                }
+
+                // Obtener valores de radio
+                const tipoBien = document.querySelector('input[name="tipoBien"]:checked').value;
+                const tipoReclamacion = document.querySelector('input[name="tipoReclamacion"]:checked').value;
+
+                // Cargar datos en vista de éxito
+                document.getElementById('res-codigo').textContent = claimCode;
+                
+                const now = new Date();
+                const formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                document.getElementById('res-fecha').textContent = formattedDate;
+                
+                document.getElementById('res-nombre').textContent = nombres;
+                document.getElementById('res-bien').textContent = tipoBien;
+                document.getElementById('res-tipo').textContent = tipoReclamacion;
+                document.getElementById('res-monto').textContent = `S/. ${parseFloat(montoBien).toFixed(2)}`;
+
+                // Intercambiar Tarjetas
+                document.getElementById('reclamacion-card').classList.add('d-none');
+                document.getElementById('success-card').classList.remove('d-none');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+
+    <style>
+        .text-gold {
+            color: var(--color-oro, #D3AF37) !important;
+        }
+        .bg-success-subtle {
+            background-color: #d1e7dd !important;
+        }
+        .bg-info-subtle {
+            background-color: #d1ecf1 !important;
+        }
+        .bg-warning-subtle {
+            background-color: #fff3cd !important;
+        }
+    </style>
+
+</body>
+
+</html>

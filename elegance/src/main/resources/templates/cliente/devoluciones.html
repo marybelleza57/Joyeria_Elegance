@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Devoluciones y Garantías', links=null)}"></head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar(active='inicio', tipo='publico')}"></div>
+
+    <main class="flex-grow-1 py-5">
+        <div class="container py-4">
+
+            <!-- Encabezado de la página -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-uppercase"
+                    style="font-family: 'Outfit', sans-serif; letter-spacing: 2px;">Mi Panel de Cuenta</h1>
+                <div class="divisor-columna mx-auto"
+                    style="width: 60px; height: 3px; background-color: var(--color-oro, #D3AF37);"></div>
+                <p class="text-muted mt-2">Administra tu información, historial de compras y preferencias.</p>
+            </div>
+
+            <!-- Alertas de éxito y error -->
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                th:if="${mensajeExito != null}">
+                <i class="fas fa-check-circle me-2 text-success"></i>
+                <span th:text="${mensajeExito}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                th:if="${mensajeError != null}">
+                <i class="fas fa-exclamation-circle me-2 text-danger"></i>
+                <span th:text="${mensajeError}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="row g-4">
+                <!-- Barra Lateral de Opciones (Sidebar) -->
+                <aside class="col-lg-3">
+                    <div th:replace="~{fragments/cliente_sidebar :: sidebar(active='devoluciones')}"></div>
+                </aside>
+
+                <!-- Contenido de las Opciones -->
+                <section class="col-lg-9">
+                    <div class="card border-0 shadow-sm rounded-0">
+                        <div class="card-header bg-white border-bottom py-3 px-4">
+                            <h4 class="mb-0 fw-bold h5 text-dark text-uppercase tracking-wider"
+                                style="font-family: 'Outfit', sans-serif;">
+                                <i class="fas fa-undo-alt me-2 text-gold"></i> Devoluciones y Garantías
+                            </h4>
+                        </div>
+                        <div class="card-body p-4 p-md-5 bg-white text-start">
+                             <!-- Estado de Solicitudes -->
+                             <div th:if="${#lists.isEmpty(devoluciones)}" class="text-center py-4 border-bottom mb-5">
+                                 <div class="mb-3">
+                                     <i class="fas fa-undo-alt text-muted opacity-50" style="font-size: 3rem;"></i>
+                                 </div>
+                                 <h5 class="fw-bold text-dark mb-1">No tienes solicitudes de devolución en curso</h5>
+                                 <p class="text-muted small mx-auto mb-0" style="max-width: 480px;">
+                                     Tu historial de solicitudes de cambios o devoluciones está limpio. Si deseas iniciar un proceso, revisa los detalles a continuación.
+                                 </p>
+                             </div>
+
+                             <div th:if="${!#lists.isEmpty(devoluciones)}" class="border-bottom mb-5">
+                                 <h5 class="fw-bold text-dark mb-3 text-uppercase tracking-wide" style="font-family: 'Outfit', sans-serif;">
+                                     Mis Solicitudes Activas
+                                 </h5>
+                                 <div class="table-responsive">
+                                     <table class="table align-middle">
+                                         <thead class="table-light text-uppercase tracking-wider" style="font-size: 0.78rem;">
+                                             <tr>
+                                                 <th class="py-3 border-0">Pedido</th>
+                                                 <th class="py-3 border-0">Total</th>
+                                                 <th class="py-3 border-0">Productos en Evaluación</th>
+                                                 <th class="py-3 text-end border-0">Detalles</th>
+                                             </tr>
+                                         </thead>
+                                         <tbody>
+                                             <tr th:each="d : ${devoluciones}">
+                                                 <td class="fw-bold text-dark py-3 align-top">
+                                                     <span th:text="${d.numeroPedido}">PE-000001</span>
+                                                     <div class="mt-1">
+                                                         <span class="badge rounded-pill text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px; padding: 4px 10px;"
+                                                             th:classappend="${d.estado.name() == 'DEV_SOLICITADA' ? 'bg-warning text-dark' : (d.estado.name() == 'DEV_APROBADA' ? 'bg-success text-white' : 'bg-danger text-white')}"
+                                                             th:text="${d.estado.name() == 'DEV_SOLICITADA' ? 'Evaluando' : (d.estado.name() == 'DEV_APROBADA' ? 'Procedió' : 'No Procedió')}">DEV_SOLICITADA</span>
+                                                     </div>
+                                                 </td>
+                                                 <td class="fw-bold text-gold align-top py-3" th:text="'S/. ' + ${#numbers.formatDecimal(d.total, 1, 2)}">S/. 0.00</td>
+                                                 <td class="align-top py-3">
+                                                     <div class="d-flex flex-column gap-2" style="max-width: 420px;">
+                                                         <div th:each="item : ${detallesPorPedido.get(d.id)}" th:if="${item.estadoDevolucion != 'NINGUNO'}" class="p-2 border rounded bg-light d-flex align-items-center justify-content-between gap-3 shadow-sm" style="font-size: 0.78rem;">
+                                                             <div class="d-flex align-items-center gap-2">
+                                                                 <img th:src="${item.producto.imagenPrincipal != null ? item.producto.imagenPrincipal : '/images/no-image.png'}" style="width: 32px; height: 32px; object-fit: cover;" class="rounded border shadow-sm">
+                                                                 <div style="line-height: 1.2;">
+                                                                     <div class="fw-bold text-dark text-truncate" style="max-width: 160px;" th:text="${item.producto.nombre}">Producto</div>
+                                                                     <div class="text-muted" style="font-size: 0.7rem;" th:text="${item.producto.material + ' | Cant: ' + item.cantidad}">Plata 925</div>
+                                                                 </div>
+                                                             </div>
+                                                             <span class="badge py-1 px-2.5 rounded text-uppercase text-dark bg-warning" style="font-size: 0.68rem; font-weight: 700;"
+                                                                 th:classappend="${item.estadoDevolucion == 'DEV_SOLICITADA' ? '' : (item.estadoDevolucion == 'DEV_APROBADA' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger')}"
+                                                                 th:text="${item.estadoDevolucion == 'DEV_SOLICITADA' ? 'Solicitada' : (item.estadoDevolucion == 'DEV_APROBADA' ? 'Aprobada' : 'Rechazada')}">Solicitada</span>
+                                                         </div>
+                                                     </div>
+                                                 </td>
+                                                 <td class="text-end align-top py-3">
+                                                     <button type="button" class="btn btn-sm btn-outline-dark px-3 py-1.5 fw-bold btn-ver-detalle" th:data-id="${d.id}">
+                                                         <i class="fas fa-eye me-1"></i> Ver
+                                                     </button>
+                                                 </td>
+                                             </tr>
+                                         </tbody>
+                                     </table>
+                                 </div>
+                             </div>
+
+                            <!-- Notas de Crédito / Saldo Disponible -->
+                             <div class="mb-5 p-4 rounded border shadow-sm" style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); color: #fff; border-color: #333 !important;">
+                                 <div class="row align-items-center">
+                                     <div class="col-md-7 mb-3 mb-md-0">
+                                         <h5 class="fw-bold text-uppercase tracking-wider mb-2" style="font-family: 'Outfit', sans-serif; color: var(--color-oro, #D3AF37);">
+                                             <i class="fas fa-wallet me-2"></i> Saldo Elegance Disponible
+                                         </h5>
+                                         <p class="small text-white-50 mb-0">
+                                             Utiliza tus Notas de Crédito activas para comprar cualquier joya en nuestra tienda online. Solo ingresa el código durante el proceso de pago.
+                                         </p>
+                                     </div>
+                                     <div class="col-md-5 text-md-end">
+                                         <span class="d-block text-white-50 small text-uppercase tracking-widest mb-1">Tu Saldo Total</span>
+                                         <h2 class="display-6 fw-bold mb-0" style="color: var(--color-oro, #D3AF37);" th:text="'S/. ' + ${#numbers.formatDecimal(saldoTotal != null ? saldoTotal : 0.00, 1, 2)}">S/. 0.00</h2>
+                                     </div>
+                                 </div>
+                             </div>
+
+                             <div class="mb-5" th:if="${!#lists.isEmpty(notasCredito)}">
+                                 <h5 class="fw-bold text-dark mb-3 text-uppercase tracking-wide" style="font-family: 'Outfit', sans-serif;">
+                                     Historial de Notas de Crédito
+                                 </h5>
+                                 <div class="table-responsive">
+                                     <table class="table align-middle">
+                                         <thead class="table-light text-uppercase tracking-wider" style="font-size: 0.78rem;">
+                                             <tr>
+                                                 <th class="py-3 border-0">Código</th>
+                                                 <th class="py-3 border-0">Fecha Emisión</th>
+                                                 <th class="py-3 border-0">Pedido Origen</th>
+                                                 <th class="py-3 border-0">Monto Inicial</th>
+                                                 <th class="py-3 border-0">Saldo Disponible</th>
+                                                 <th class="py-3 border-0">Estado</th>
+                                             </tr>
+                                         </thead>
+                                         <tbody>
+                                             <tr th:each="nc : ${notasCredito}">
+                                                 <td class="py-3">
+                                                     <div class="d-flex align-items-center gap-2">
+                                                         <code class="fw-bold px-2 py-1 bg-light border text-dark rounded" style="font-size: 0.9rem;" th:text="${nc.codigo}">NC-XXXXXX</code>
+                                                         <button type="button" class="btn btn-sm btn-link text-gold p-0 btn-copy-code" th:data-code="${nc.codigo}" title="Copiar código">
+                                                             <i class="far fa-copy"></i>
+                                                         </button>
+                                                     </div>
+                                                 </td>
+                                                 <td class="py-3 text-muted" th:text="${#temporals.format(nc.fechaEmision, 'dd/MM/yyyy')}">01/01/2026</td>
+                                                 <td class="py-3 text-dark fw-semibold" th:text="${nc.pedidoOrigen != null ? nc.pedidoOrigen.numeroPedido : '-'}">PE-000020</td>
+                                                 <td class="py-3 text-muted" th:text="'S/. ' + ${#numbers.formatDecimal(nc.montoInicial, 1, 2)}">S/. 100.00</td>
+                                                 <td class="py-3 text-gold fw-bold" th:text="'S/. ' + ${#numbers.formatDecimal(nc.montoDisponible, 1, 2)}">S/. 100.00</td>
+                                                 <td class="py-3">
+                                                     <span class="badge rounded-pill text-uppercase px-2.5 py-1" style="font-size: 0.68rem; font-weight: 700;"
+                                                           th:classappend="${nc.estado == 'ACTIVO' ? 'bg-success text-white' : (nc.estado == 'USADO_PARCIAL' ? 'bg-info text-white' : (nc.estado == 'USADO_TOTAL' ? 'bg-secondary text-white' : 'bg-danger text-white'))}"
+                                                           th:text="${nc.estado == 'ACTIVO' ? 'Activo' : (nc.estado == 'USADO_PARCIAL' ? 'Parcial' : (nc.estado == 'USADO_TOTAL' ? 'Usado' : 'Expirado'))}">ACTIVO</span>
+                                                 </td>
+                                             </tr>
+                                         </tbody>
+                                     </table>
+                                 </div>
+                             </div>
+
+                             <!-- Política de Devoluciones -->
+                            <h5 class="fw-bold text-dark mb-3 text-uppercase tracking-wide" style="font-family: 'Outfit', sans-serif;">
+                                <i class="fas fa-info-circle text-gold me-2"></i>Política de Devolución Presencial con Evaluación
+                            </h5>
+                            <p class="text-muted small mb-4">
+                                En Joyería Elegante garantizamos la máxima calidad. Si necesitas realizar un cambio o devolución de una joya adquirida, nuestro procedimiento se realiza de forma presencial para asegurar una evaluación experta del producto.
+                            </p>
+
+                            <!-- Línea de Pasos / Cómo funciona -->
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded border h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-weight: bold; background-color: var(--color-oro, #D3AF37);">1</div>
+                                            <h6 class="fw-bold text-dark mb-0">Solicitud Previa</h6>
+                                        </div>
+                                        <p class="text-muted small mb-0">
+                                            Antes de acudir a la tienda, contáctanos por WhatsApp al <strong>+51 996 037 711</strong> o correo electrónico para solicitar tu <strong>"Autorización de Devolución de Mercancía"</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded border h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-weight: bold; background-color: var(--color-oro, #D3AF37);">2</div>
+                                            <h6 class="fw-bold text-dark mb-0">Evaluación Presencial</h6>
+                                        </div>
+                                        <p class="text-muted small mb-0">
+                                            Visita nuestro local con la joya, su <strong>empaque original</strong> y el <strong>comprobante de pago</strong>. Dirección: <br>
+                                            <strong class="text-dark"><i class="fas fa-map-marker-alt text-gold me-1"></i> Jirón Cruz del Sur 140, Santiago de Surco, Lima</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded border h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-weight: bold; background-color: var(--color-oro, #D3AF37);">3</div>
+                                            <h6 class="fw-bold text-dark mb-0">Evaluación del Producto</h6>
+                                        </div>
+                                        <p class="text-muted small mb-0">
+                                            El personal especializado de la tienda o taller examinará la pieza para certificar que se encuentra en perfectas condiciones, sin rastros de uso, desgastes, daños ni alteraciones de ningún tipo.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded border h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-gold text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; font-weight: bold; background-color: var(--color-oro, #D3AF37);">4</div>
+                                            <h6 class="fw-bold text-dark mb-0">Nota de Crédito</h6>
+                                        </div>
+                                        <p class="text-muted small mb-0">
+                                            Si se aprueba el cambio dentro del plazo legal de <strong>7 a 15 días</strong>, emitiremos una <strong>Nota de Crédito</strong> correspondiente al valor de compra para que la uses en futuras piezas de nuestra colección (no realizamos reembolsos en efectivo).
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nota importante de soporte -->
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 border-start border-3 border-warning bg-warning-subtle rounded-end small text-muted h-100">
+                                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                        <strong>Exclusiones de Garantía:</strong> Los productos modificados a pedido (grabados personalizados, tallas a medida especiales) no están sujetos a cambios ni devoluciones una vez confirmada la entrega.
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 border-start border-3 border-info bg-info-subtle rounded-end small text-muted h-100">
+                                        <i class="fas fa-truck text-info me-2"></i>
+                                        <strong>Políticas de Envío en Devoluciones:</strong>
+                                        <ul class="mb-0 ps-3 mt-1" style="font-size: 0.8rem;">
+                                            <li><strong>Si la devolución es aprobada:</strong> Se emite la Nota de Crédito por el valor total de la joya (el costo de envío original no es reembolsable).</li>
+                                            <li><strong>Si la devolución NO procede:</strong> El cliente deberá recoger el producto presencialmente en tienda sin costo, o asumir la tarifa de envío de retorno a su domicilio (S/. 15 en Lima, S/. 25 en provincias).</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Modales -->
+    <div th:replace="~{fragments/modales :: modales}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Handler para cargar los detalles del pedido en el modal
+            $('.btn-ver-detalle').on('click', function () {
+                const pedidoId = $(this).attr('data-id');
+                if (!pedidoId) return;
+
+                fetch(`/api/pedidos/${pedidoId}/detalles`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("No se pudo cargar el detalle del pedido");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Cargar datos generales
+                        document.getElementById("detalle-nro-pedido").textContent = data.numeroPedido;
+                        document.getElementById("detalle-fecha").textContent = data.fecha;
+
+                        // Estado badge styling
+                        const estadoBadge = document.getElementById("detalle-estado");
+                        let displayEstado = data.estado;
+                        if (data.estado === "DEV_SOLICITADA") displayEstado = "DEV. SOLICITADA";
+                        else if (data.estado === "DEV_APROBADA") displayEstado = "DEV. APROBADA";
+                        else if (data.estado === "DEV_RECHAZADA") displayEstado = "DEV. RECHAZADA";
+                        estadoBadge.textContent = displayEstado;
+
+                        estadoBadge.className = "badge px-2.5 py-1.5 rounded-pill";
+                        if (data.estado === "PENDIENTE" || data.estado === "DEV_SOLICITADA") {
+                            estadoBadge.classList.add("bg-warning", "text-dark");
+                        } else if (data.estado === "CANCELADO" || data.estado === "DEV_RECHAZADA") {
+                            estadoBadge.classList.add("bg-danger", "text-white");
+                        } else if (data.estado === "EN_TRANSITO") {
+                            estadoBadge.classList.add("bg-info", "text-dark");
+                        } else {
+                            estadoBadge.classList.add("bg-success", "text-white");
+                        }
+
+                        document.getElementById("detalle-direccion").textContent = data.direccionEnvio;
+                        document.getElementById("detalle-dni").textContent = data.dni;
+                        document.getElementById("detalle-telefono").textContent = data.telefonoContacto;
+                        document.getElementById("detalle-notas").textContent = data.notas || "Ninguna";
+
+                        // Mostrar banner tránsito si aplica
+                        const transitoBanner = document.getElementById("detalle-transito-banner");
+                        if (data.estado === "EN_TRANSITO") {
+                            transitoBanner.classList.remove("d-none");
+                        } else {
+                            transitoBanner.classList.add("d-none");
+                        }
+
+                        // Mostrar fecha entrega si aplica
+                        const entregaContainer = document.getElementById("detalle-entrega-container");
+                        if (data.fechaEntrega) {
+                            document.getElementById("detalle-fecha-entrega").textContent = data.fechaEntrega;
+                            entregaContainer.classList.remove("d-none");
+                        } else {
+                            entregaContainer.classList.add("d-none");
+                        }
+
+                        // Motivo cancelación
+                        const cancelacionContainer = document.getElementById("detalle-cancelacion-container");
+                        if (data.estado === "CANCELADO") {
+                            document.getElementById("detalle-motivo-cancelacion").textContent = data.motivoCancelacion || "No especificado";
+                            cancelacionContainer.classList.remove("d-none");
+                        } else {
+                            cancelacionContainer.classList.add("d-none");
+                        }
+
+                        document.getElementById("detalle-cant-total").textContent = data.totalCantidad;
+                        document.getElementById("detalle-total-monto").textContent = `S/. ${parseFloat(data.total).toFixed(2)}`;
+
+                        // Llenar tabla de productos
+                        const tbody = document.getElementById("detalle-productos-tbody");
+                        tbody.innerHTML = "";
+
+                        data.items.forEach(item => {
+                            const tr = document.createElement("tr");
+
+                            // Celda de imagen
+                            const tdImagen = document.createElement("td");
+                            const img = document.createElement("img");
+                            img.src = item.imagen || "/images/no-image.png";
+                            img.alt = item.productoNombre;
+                            img.className = "rounded shadow-sm";
+                            img.style.width = "45px";
+                            img.style.height = "45px";
+                            img.style.objectFit = "cover";
+                            tdImagen.appendChild(img);
+
+                            // Celda de nombre
+                            const tdNombre = document.createElement("td");
+                            tdNombre.className = "fw-semibold text-dark small";
+                            tdNombre.textContent = item.productoNombre;
+
+                            // Celda de material
+                            const tdMaterial = document.createElement("td");
+                            tdMaterial.className = "text-muted small";
+                            tdMaterial.textContent = item.material || "-";
+
+                            // Celda de precio
+                            const tdPrecio = document.createElement("td");
+                            tdPrecio.className = "text-center text-dark small";
+                            tdPrecio.textContent = `S/. ${parseFloat(item.precioUnitario).toFixed(2)}`;
+
+                            // Celda de cantidad
+                            const tdCantidad = document.createElement("td");
+                            tdCantidad.className = "text-center text-muted small";
+                            tdCantidad.textContent = item.cantidad;
+
+                            // Celda de devolución
+                            const tdDevolucion = document.createElement("td");
+                            tdDevolucion.className = "text-center small";
+                            if (item.estadoDevolucion === "DEV_SOLICITADA") {
+                                tdDevolucion.innerHTML = '<span class="badge bg-warning text-dark px-2 py-1 rounded">Solicitada</span>';
+                            } else if (item.estadoDevolucion === "DEV_APROBADA") {
+                                tdDevolucion.innerHTML = '<span class="badge bg-success text-white px-2 py-1 rounded">Aprobada</span>';
+                            } else if (item.estadoDevolucion === "DEV_RECHAZADA") {
+                                tdDevolucion.innerHTML = '<span class="badge bg-danger text-white px-2 py-1 rounded">Rechazada</span>';
+                            } else {
+                                tdDevolucion.innerHTML = '<span class="text-muted">-</span>';
+                            }
+
+                            // Celda de subtotal
+                            const tdSubtotal = document.createElement("td");
+                            tdSubtotal.className = "text-end fw-bold text-dark small";
+                            tdSubtotal.textContent = `S/. ${parseFloat(item.subtotal).toFixed(2)}`;
+
+                            tr.appendChild(tdImagen);
+                            tr.appendChild(tdNombre);
+                            tr.appendChild(tdMaterial);
+                            tr.appendChild(tdPrecio);
+                            tr.appendChild(tdCantidad);
+                            tr.appendChild(tdDevolucion);
+                            tr.appendChild(tdSubtotal);
+
+                            tbody.appendChild(tr);
+                        });
+
+                        // Mostrar modal
+                        const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetallePedido"));
+                        modalDetalle.show();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    });
+            });
+        });
+
+        // Copiar código de Nota de Crédito
+        document.querySelectorAll(".btn-copy-code").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const code = this.getAttribute("data-code");
+                navigator.clipboard.writeText(code).then(() => {
+                    const icon = this.querySelector("i");
+                    icon.className = "fas fa-check text-success";
+                    setTimeout(() => {
+                        icon.className = "far fa-copy";
+                    }, 2000);
+                }).catch(err => {
+                    console.error("Error al copiar al portapapeles: ", err);
+                });
+            });
+        });
+    </script>
+
+    <style>
+        /* Estilo del Sidebar Activo */
+        #settings-list .list-group-item {
+            color: var(--color-gris-oscuro, #4A4A4A);
+            background-color: #ffffff;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent !important;
+        }
+
+        #settings-list .list-group-item:hover {
+            background-color: #f8f9fa;
+            color: var(--color-oro, #D3AF37);
+        }
+
+        #settings-list .list-group-item.active {
+            background-color: #f8f9fa !important;
+            color: var(--color-oro, #D3AF37) !important;
+            border-left: 3px solid var(--color-oro, #D3AF37) !important;
+        }
+
+        .btn-principal {
+            background-color: var(--color-oro, #D3AF37) !important;
+            border-color: var(--color-oro, #D3AF37) !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 10px 24px;
+            border-radius: 0px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-principal:hover,
+        .btn-principal:focus,
+        .btn-principal:active {
+            background-color: var(--color-negro-elegante, #1A1A1A) !important;
+            border-color: var(--color-negro-elegante, #1A1A1A) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .text-gold {
+            color: var(--color-oro, #D3AF37) !important;
+        }
+    </style>
+
+</body>
+
+</html>

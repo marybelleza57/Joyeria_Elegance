@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Panel Devoluciones', links=~{::link})}">
+    <!-- Simple DataTables CSS -->
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.0.8/datatables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" rel="stylesheet">
+    <!-- Admin Custom CSS -->
+    <link th:href="@{/css/admin.css?v=10}" rel="stylesheet" type="text/css">
+</head>
+
+<body style="font-family: 'Inter', sans-serif; background-color: var(--color-claro);">
+
+    <!-- Topbar Admin -->
+    <nav th:replace="~{fragments/admin-components :: topbar}"></nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Admin -->
+            <nav th:replace="~{fragments/admin-components :: sidebar(activeTab='devoluciones')}"></nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="admin-page-title">Evaluación de Devoluciones (Presencial)</h2>
+                </div>
+
+                <!-- Alertas de éxito y error -->
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                    th:if="${success != null}">
+                    <i class="fas fa-check-circle me-2 text-success"></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                    th:if="${error != null}">
+                    <i class="fas fa-exclamation-circle me-2 text-danger"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Iniciar Devolución Presencial (Buscador) -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold text-dark mb-3" style="font-family: 'Outfit', sans-serif;">
+                            <i class="fas fa-search-plus text-oro me-2"></i>Registrar / Buscar Pedido para Devolución
+                        </h5>
+                        <form th:action="@{/admin/devoluciones/buscar-pedido}" method="POST" class="row g-3 align-items-center">
+                            <div class="col-md-8 col-lg-9">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-secondary-subtle"><i class="fas fa-hashtag text-muted"></i></span>
+                                    <input type="text" name="numeroPedido" class="form-control border-secondary-subtle" 
+                                           placeholder="Ingrese el número de pedido exacto (Ej: PE-000020)" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <button type="submit" class="btn btn-dark w-100 rounded-3 fw-bold" style="background-color: var(--color-negro-premium, #0d0d0d); color: white;">
+                                    <i class="fas fa-arrow-right me-1"></i> Iniciar Proceso
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de Solicitudes Activas -->
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                    <div class="card-header bg-white py-3 px-4 border-bottom">
+                        <h5 class="mb-0 fw-bold text-dark small text-uppercase tracking-wider">
+                            <i class="fas fa-list text-oro me-2"></i>Historial de Evaluaciones y Solicitudes
+                        </h5>
+                    </div>
+                    
+                    <div class="card-body p-0">
+                        <!-- Estado vacío -->
+                        <div th:if="${#lists.isEmpty(devoluciones)}" class="text-center py-5 px-4">
+                            <div class="mb-4">
+                                <span class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-undo-alt fa-2x opacity-50"></i>
+                                </span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-1">Sin Solicitudes Pendientes de Devolución</h5>
+                            <p class="text-muted small mx-auto mb-0" style="max-width: 480px;">
+                                No hay pedidos en proceso de devolución. Ingrese el número de un pedido entregado arriba para iniciar una evaluación presencial.
+                            </p>
+                        </div>
+
+                        <!-- Tabla dinámica de solicitudes -->
+                        <div th:if="${not #lists.isEmpty(devoluciones)}" class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" id="tabla-devoluciones">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="text-uppercase text-muted fw-bold small py-3 px-4 border-0" style="width: 12%;">Pedido</th>
+                                        <th class="text-uppercase text-muted fw-bold small py-3 border-0" style="width: 18%;">Cliente</th>
+                                        <th class="text-uppercase text-muted fw-bold small py-3 border-0" style="width: 12%;">Total</th>
+                                        <th class="text-uppercase text-muted fw-bold small py-3 border-0" style="width: 38%;">Evaluación por Producto</th>
+                                        <th class="text-uppercase text-muted fw-bold small py-3 border-0" style="width: 12%;">Dirección</th>
+                                        <th class="text-uppercase text-muted fw-bold small py-3 text-end px-4 border-0" style="width: 8%;">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="d : ${devoluciones}">
+                                        <td class="px-4 fw-bold text-dark align-middle">
+                                            <span th:text="${d.numeroPedido}">PE-000001</span>
+                                            <div class="mt-1">
+                                                <span class="badge rounded-pill text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px; padding: 4px 10px;"
+                                                    th:classappend="${d.estado.name() == 'DEV_SOLICITADA' ? 'bg-warning text-dark' : (d.estado.name() == 'DEV_APROBADA' ? 'bg-success text-white' : 'bg-danger text-white')}"
+                                                    th:text="${d.estado.name() == 'DEV_SOLICITADA' ? 'Evaluando' : (d.estado.name() == 'DEV_APROBADA' ? 'Procedió' : 'No Procedió')}">DEV_SOLICITADA</span>
+                                            </div>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="small fw-bold text-dark" th:text="${d.cliente.nombres + ' ' + (d.cliente.apellidos != null ? d.cliente.apellidos : '')}">Cliente</div>
+                                            <div class="small text-muted" th:text="${d.telefonoContacto}">999999999</div>
+                                        </td>
+                                        <td class="fw-bold text-gold align-middle" th:text="'S/. ' + ${#numbers.formatDecimal(d.total, 1, 2)}">S/. 0.00</td>
+                                        <td class="align-middle">
+                                            <!-- Lista de Productos con su respectivo selector de devolución -->
+                                            <div class="d-flex flex-column gap-2 my-2" style="max-width: 480px;">
+                                                <div th:each="item : ${detallesPorPedido.get(d.id)}" class="p-2 border rounded bg-light d-flex align-items-center justify-content-between gap-3 shadow-sm" style="font-size: 0.8rem;">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <img th:src="${item.producto.imagenPrincipal != null ? item.producto.imagenPrincipal : '/images/no-image.png'}" style="width: 38px; height: 38px; object-fit: cover;" class="rounded border shadow-sm">
+                                                        <div style="line-height: 1.25;">
+                                                            <div class="fw-bold text-dark text-truncate" style="max-width: 180px;" th:title="${item.producto.nombre}" th:text="${item.producto.nombre}">Producto</div>
+                                                            <div class="text-muted" style="font-size: 0.72rem;" th:text="${item.producto.material + ' | Cant: ' + item.cantidad}">Plata 925</div>
+                                                        </div>
+                                                    </div>
+                                                    <form th:action="@{/admin/devoluciones/actualizar-item-estado}" method="POST" class="m-0 select-item-form">
+                                                        <input type="hidden" name="itemId" th:value="${item.id}">
+                                                        <select name="estadoDevolucion" class="form-select form-select-sm select-estado-item-devolucion py-1 px-2 border-secondary-subtle rounded-3 fw-semibold text-dark bg-warning"
+                                                            style="width: 135px; font-size: 0.76rem; cursor: pointer; height: 30px;"
+                                                            th:classappend="${item.estadoDevolucion == 'DEV_SOLICITADA' ? '' : (item.estadoDevolucion == 'DEV_APROBADA' ? 'bg-success-subtle text-success' : (item.estadoDevolucion == 'DEV_RECHAZADA' ? 'bg-danger-subtle text-danger' : 'bg-light text-muted'))}">
+                                                            <option value="NINGUNO" th:selected="${item.estadoDevolucion == 'NINGUNO'}">NINGUNO</option>
+                                                            <option value="DEV_SOLICITADA" th:selected="${item.estadoDevolucion == 'DEV_SOLICITADA'}">SOLICITADA</option>
+                                                            <option value="DEV_APROBADA" th:selected="${item.estadoDevolucion == 'DEV_APROBADA'}">APROBADA</option>
+                                                            <option value="DEV_RECHAZADA" th:selected="${item.estadoDevolucion == 'DEV_RECHAZADA'}">RECHAZADA</option>
+                                                        </select>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted small align-middle" th:text="${d.direccionEnvio}">Dirección de envío</td>
+                                        <td class="text-end px-4 align-middle">
+                                            <button type="button" class="btn btn-sm btn-outline-dark px-3 py-1.5 fw-bold btn-ver-detalle" th:data-id="${d.id}">
+                                                <i class="fas fa-eye me-1"></i> Detalles
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div th:replace="~{fragments/modales :: modales}"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script th:src="@{/js/admin.js?v=10}"></script>
+    <script>
+        $(document).ready(function () {
+            // Envío automático al cambiar el select con delegación de eventos
+            $(document).on('change', '.select-estado-item-devolucion', function () {
+                $(this).closest('form').submit();
+            });
+
+            // Handler para cargar los detalles del pedido en el modal con delegación de eventos
+            $(document).on('click', '.btn-ver-detalle', function () {
+                const pedidoId = $(this).attr('data-id');
+                if (!pedidoId) return;
+
+                fetch(`/api/admin/pedidos/${pedidoId}/detalles`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("No se pudo cargar el detalle del pedido");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Cargar datos generales
+                        document.getElementById("detalle-nro-pedido").textContent = data.numeroPedido;
+                        document.getElementById("detalle-fecha").textContent = data.fecha;
+
+                        // Estado badge styling
+                        const estadoBadge = document.getElementById("detalle-estado");
+                        let displayEstado = data.estado;
+                        if (data.estado === "DEV_SOLICITADA") displayEstado = "DEV. SOLICITADA";
+                        else if (data.estado === "DEV_APROBADA") displayEstado = "DEV. APROBADA";
+                        else if (data.estado === "DEV_RECHAZADA") displayEstado = "DEV. RECHAZADA";
+                        estadoBadge.textContent = displayEstado;
+
+                        estadoBadge.className = "badge px-2.5 py-1.5 rounded-pill";
+                        if (data.estado === "PENDIENTE" || data.estado === "DEV_SOLICITADA") {
+                            estadoBadge.classList.add("bg-warning", "text-dark");
+                        } else if (data.estado === "CANCELADO" || data.estado === "DEV_RECHAZADA") {
+                            estadoBadge.classList.add("bg-danger", "text-white");
+                        } else if (data.estado === "EN_TRANSITO") {
+                            estadoBadge.classList.add("bg-info", "text-dark");
+                        } else {
+                            estadoBadge.classList.add("bg-success", "text-white");
+                        }
+
+                        document.getElementById("detalle-direccion").textContent = data.direccionEnvio;
+                        document.getElementById("detalle-dni").textContent = data.dni;
+                        document.getElementById("detalle-telefono").textContent = data.telefonoContacto;
+                        document.getElementById("detalle-notas").textContent = data.notas || "Ninguna";
+
+                        // Mostrar banner tránsito si aplica
+                        const transitoBanner = document.getElementById("detalle-transito-banner");
+                        if (data.estado === "EN_TRANSITO") {
+                            transitoBanner.classList.remove("d-none");
+                        } else {
+                            transitoBanner.classList.add("d-none");
+                        }
+
+                        // Mostrar fecha entrega si aplica
+                        const entregaContainer = document.getElementById("detalle-entrega-container");
+                        if (data.fechaEntrega) {
+                            document.getElementById("detalle-fecha-entrega").textContent = data.fechaEntrega;
+                            entregaContainer.classList.remove("d-none");
+                        } else {
+                            entregaContainer.classList.add("d-none");
+                        }
+
+                        // Motivo cancelación
+                        const cancelacionContainer = document.getElementById("detalle-cancelacion-container");
+                        if (data.estado === "CANCELADO") {
+                            document.getElementById("detalle-motivo-cancelacion").textContent = data.motivoCancelacion || "No especificado";
+                            cancelacionContainer.classList.remove("d-none");
+                        } else {
+                            cancelacionContainer.classList.add("d-none");
+                        }
+
+                        document.getElementById("detalle-cant-total").textContent = data.totalCantidad;
+                        document.getElementById("detalle-total-monto").textContent = `S/. ${parseFloat(data.total).toFixed(2)}`;
+
+                        // Llenar tabla de productos
+                        const tbody = document.getElementById("detalle-productos-tbody");
+                        tbody.innerHTML = "";
+
+                        data.items.forEach(item => {
+                            const tr = document.createElement("tr");
+
+                            // Celda de imagen
+                            const tdImagen = document.createElement("td");
+                            const img = document.createElement("img");
+                            img.src = item.imagen || "/images/no-image.png";
+                            img.alt = item.productoNombre;
+                            img.className = "rounded shadow-sm";
+                            img.style.width = "45px";
+                            img.style.height = "45px";
+                            img.style.objectFit = "cover";
+                            tdImagen.appendChild(img);
+
+                            // Celda de nombre
+                            const tdNombre = document.createElement("td");
+                            tdNombre.className = "fw-semibold text-dark small";
+                            tdNombre.textContent = item.productoNombre;
+
+                            // Celda de material
+                            const tdMaterial = document.createElement("td");
+                            tdMaterial.className = "text-muted small";
+                            tdMaterial.textContent = item.material || "-";
+
+                            // Celda de precio
+                            const tdPrecio = document.createElement("td");
+                            tdPrecio.className = "text-center text-dark small";
+                            tdPrecio.textContent = `S/. ${parseFloat(item.precioUnitario).toFixed(2)}`;
+
+                            // Celda de cantidad
+                            const tdCantidad = document.createElement("td");
+                            tdCantidad.className = "text-center text-muted small";
+                            tdCantidad.textContent = item.cantidad;
+
+                            // Celda de devolución
+                            const tdDevolucion = document.createElement("td");
+                            tdDevolucion.className = "text-center small";
+                            if (item.estadoDevolucion === "DEV_SOLICITADA") {
+                                tdDevolucion.innerHTML = '<span class="badge bg-warning text-dark px-2 py-1 rounded">Solicitada</span>';
+                            } else if (item.estadoDevolucion === "DEV_APROBADA") {
+                                tdDevolucion.innerHTML = '<span class="badge bg-success text-white px-2 py-1 rounded">Aprobada</span>';
+                            } else if (item.estadoDevolucion === "DEV_RECHAZADA") {
+                                tdDevolucion.innerHTML = '<span class="badge bg-danger text-white px-2 py-1 rounded">Rechazada</span>';
+                            } else {
+                                tdDevolucion.innerHTML = '<span class="text-muted">-</span>';
+                            }
+
+                            // Celda de subtotal
+                            const tdSubtotal = document.createElement("td");
+                            tdSubtotal.className = "text-end fw-bold text-dark small";
+                            tdSubtotal.textContent = `S/. ${parseFloat(item.subtotal).toFixed(2)}`;
+
+                            tr.appendChild(tdImagen);
+                            tr.appendChild(tdNombre);
+                            tr.appendChild(tdMaterial);
+                            tr.appendChild(tdPrecio);
+                            tr.appendChild(tdCantidad);
+                            tr.appendChild(tdDevolucion);
+                            tr.appendChild(tdSubtotal);
+
+                            tbody.appendChild(tr);
+                        });
+
+                        // Mostrar modal
+                        const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetallePedido"));
+                        modalDetalle.show();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

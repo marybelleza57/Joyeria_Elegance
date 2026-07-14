@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-EleganceApplication<elegance>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.joyas.elegance.EleganceApplication",
+            "projectName": "elegance",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

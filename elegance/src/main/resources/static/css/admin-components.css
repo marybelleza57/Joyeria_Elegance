@@ -1,0 +1,170 @@
+:root {
+    --color-oscuro: #1A1A1A;
+    --color-oro: #D3AF37;
+}
+
+/* Topbar */
+#adminTopbar {
+    background-color: var(--color-oscuro);
+    position: sticky;
+    top: 0;
+    z-index: 1050;
+    border-bottom: 1px solid rgba(211, 175, 55, 0.15) !important;
+}
+
+#adminTopbar .navbar-brand {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 2px;
+    font-size: 1.3rem;
+}
+
+#adminTopbar .navbar-brand .brand-gold {
+    color: #D3AF37 !important;
+    margin-right: 6px;
+}
+
+#adminTopbar .navbar-brand .brand-white {
+    color: #ffffff !important;
+}
+
+.text-gold {
+    color: var(--color-oro) !important;
+}
+
+.admin-role-badge {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    font-weight: 600;
+}
+
+#btnIrTienda {
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    padding: 6px 16px;
+    color: #ffffff !important;
+    border: 1.5px solid #ffffff !important;
+    background-color: transparent !important;
+}
+
+.hover-rotate {
+    transition: transform 0.3s ease;
+}
+
+.hover-rotate:hover {
+    transform: rotate(45deg);
+}
+
+/* Dropdown */
+#adminDropdownMenu {
+    background-color: var(--color-oscuro);
+    border: 1px solid rgba(211, 175, 55, 0.2) !important;
+}
+
+.dropdown-item {
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+    color: #ffffff !important;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color-oro) !important;
+    color: var(--color-oscuro) !important;
+}
+
+.dropdown-item:hover i {
+    color: var(--color-oscuro) !important;
+}
+
+/* Modal */
+#changePasswordModalContent {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.modal-divider {
+    width: 50px;
+    height: 3px;
+    background-color: var(--color-oro, #D3AF37);
+    margin-bottom: 1rem;
+}
+
+#btnActualizarPassword {
+    background-color: var(--color-oro);
+    border-color: var(--color-oro);
+    letter-spacing: 1px;
+}
+
+#btnActualizarPassword:hover {
+    background-color: #b8941f;
+    border-color: #b8941f;
+}
+
+/* Sidebar */
+#sidebarAdmin {
+    background-color: var(--color-oscuro);
+    border-right: 1px solid rgba(211, 175, 55, 0.1) !important;
+}
+
+#sidebarHeader {
+    background-color: var(--color-oscuro);
+    border-bottom-color: rgba(211, 175, 55, 0.1) !important;
+}
+
+#sidebarBody {
+    min-height: calc(100vh - 70px);
+}
+
+.section-title {
+    letter-spacing: 1.5px;
+    color: rgba(211, 175, 55, 0.5);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+}
+
+.admin-nav-link {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    padding: 10px 20px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.admin-nav-link:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left-color: var(--color-oro);
+}
+
+.admin-nav-link.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-left: 3px solid var(--color-oro);
+}
+
+.admin-nav-link .icon-fixed-width {
+    width: 20px;
+    text-align: center;
+}
+
+#btnLogout {
+    border-left: 3px solid transparent;
+}
+
+#btnLogout:hover {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+    border-left-color: #dc3545 !important;
+}
+
+.btn-principal {
+    background-color: var(--color-oro);
+    border-color: var(--color-oro);
+    letter-spacing: 1px;
+}
+
+.btn-principal:hover {
+    background-color: #b8941f;
+    border-color: #b8941f;
+}

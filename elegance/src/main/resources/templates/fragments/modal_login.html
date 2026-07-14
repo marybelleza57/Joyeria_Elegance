@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="modalLogin" class="modal fade" id="modalLogin" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h4 class="modal-title fw-bold text-dark pt-2" style="font-family: 'Outfit', sans-serif;">Acceso
+                        Clientes</h4>
+                    <button type="button" class="btn-close me-1 mt-1" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3" style="width: 50px; height: 3px; background-color: var(--color-oro, #D3AF37);">
+                    </div>
+
+                    <!-- Alerta de Error de Login -->
+                    <div class="alert alert-danger py-2 small mb-3" th:if="${errorLogin != null}"
+                        th:text="${errorLogin}"></div>
+
+                    <form id="formLoginCliente" th:action="@{/cliente/login}" method="POST" class="needs-validation"
+                        novalidate>
+                        <!-- Campo Correo -->
+                        <div class="mb-3">
+                            <label for="inputEmailLoginCliente"
+                                class="form-label fw-semibold text-dark small mb-1">Correo electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-envelope text-muted"></i></span>
+                                <input type="email" name="correo" class="form-control bg-white"
+                                    id="inputEmailLoginCliente" placeholder="ejemplo@correo.com" required
+                                    style="border-color: #dee2e6;">
+                                <div class="invalid-feedback">Por favor, introduce un correo válido.</div>
+                            </div>
+                        </div>
+                        <!-- Campo Contraseña -->
+                        <div class="mb-2">
+                            <label for="inputPasswordLoginCliente"
+                                class="form-label fw-semibold text-dark small mb-1">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-lock text-muted"></i></span>
+                                <input type="password" name="contrasena"
+                                    class="form-control bg-white border-start-0 border-end-0"
+                                    id="inputPasswordLoginCliente" placeholder="••••••••" required
+                                    style="border-color: #dee2e6;">
+                                <button class="btn btn-outline-secondary border-start-0 bg-white" type="button"
+                                    id="togglePasswordLoginCliente"
+                                    style="border-color: #dee2e6; color: #6c757d; border-radius: 0 0.375rem 0.375rem 0;">
+                                    <i class="fas fa-eye-slash" id="eyeIconLoginCliente"></i>
+                                </button>
+                                <div class="invalid-feedback">La contraseña es obligatoria.</div>
+                            </div>
+                        </div>
+                        <!-- Enlace Olvidé mi Contraseña -->
+                        <div class="text-end mb-3">
+                            <a th:href="@{/cliente/olvide-contrasena}"
+                                class="text-gold fw-bold text-decoration-none small" style="font-size: 0.85rem;">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+                        <!-- Botón de Envío -->
+                        <button type="submit" class="btn btn-principal w-100 py-2.5 mt-2 shadow-sm">
+                            Iniciar Sesión <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        <p class="text-center small text-muted mt-3 mb-0">¿No tienes cuenta? <a href="#"
+                                class="text-gold fw-bold text-decoration-none" data-bs-toggle="modal"
+                                data-bs-target="#modalRegistro">Registrarse</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

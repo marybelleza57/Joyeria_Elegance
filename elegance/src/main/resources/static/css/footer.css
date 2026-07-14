@@ -1,0 +1,41 @@
+/* Stylings for modular reusable footer in Joyería Elegante */
+
+.footer-principal {
+    background-color: var(--color-negro-premium, #0d0d0d) !important;
+    border-top: 1px solid var(--color-borde-principal, rgba(255,255,255,0.05));
+}
+
+.footer-logo {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.footer-logo .text-oro {
+    color: var(--color-oro, #D3AF37) !important;
+}
+
+.footer-logo .text-blanco {
+    color: var(--color-blanco, #FFFFFF) !important;
+}
+
+.footer-titulo-contacto {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-oro, #D3AF37) !important;
+}
+
+.footer-texto-secundario {
+    color: rgba(255, 255, 255, 0.5) !important;
+}

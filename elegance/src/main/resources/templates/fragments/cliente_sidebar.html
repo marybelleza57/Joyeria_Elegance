@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+    <div th:fragment="sidebar(active)">
+        <aside class="col-12">
+            <div class="card border-0 shadow-sm rounded-0 overflow-hidden">
+                <div class="list-group list-group-flush" id="settings-list">
+                    <!-- Datos Personales -->
+                    <a th:href="@{/cliente/configuracion}"
+                        class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 d-flex align-items-center"
+                        th:classappend="${active == 'datos'} ? 'active' : ''">
+                        <i class="fas fa-user-cog me-3 text-gold"></i>
+                        Datos Personales
+                    </a>
+                    <!-- Cambiar Contraseña -->
+                    <a th:href="@{/cliente/contraseña}"
+                        class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 d-flex align-items-center"
+                        th:classappend="${active == 'contraseña'} ? 'active' : ''">
+                        <i class="fas fa-key me-3 text-gold"></i>
+                        Cambiar Contraseña
+                    </a>
+                    <!-- Pedidos -->
+                    <a th:href="@{/cliente/pedidos}"
+                        class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 d-flex align-items-center"
+                        th:classappend="${active == 'pedidos'} ? 'active' : ''">
+                        <i class="fas fa-shopping-bag me-3 text-gold"></i>
+                        Pedidos
+                    </a>
+                    <!-- Devoluciones -->
+                    <a th:href="@{/cliente/devoluciones}"
+                        class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 d-flex align-items-center"
+                        th:classappend="${active == 'devoluciones'} ? 'active' : ''">
+                        <i class="fas fa-undo me-3 text-gold"></i>
+                        Devoluciones
+                    </a>
+                    <!-- Nota de Crédito -->
+                    <a th:href="@{/cliente/notas-credito}"
+                        class="list-group-item list-group-item-action py-3 px-4 fw-semibold border-0 d-flex align-items-center"
+                        th:classappend="${active == 'notas-credito'} ? 'active' : ''">
+                        <i class="fas fa-file-invoice-dollar me-3 text-gold"></i>
+                        Nota de Crédito
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <!-- Modal Pago Yape -->
+    <div th:fragment="modalPago" class="modal fade" id="modalPago" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h4 class="modal-title fw-bold text-dark pt-2" style="font-family: 'Outfit', sans-serif;">
+                        <i class="fas fa-qrcode text-gold me-2"></i>Pago con Yape
+                    </h4>
+                    <button type="button" class="btn-close me-1 mt-1" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3" style="width: 50px; height: 3px; background-color: var(--color-oro, #D3AF37);">
+                    </div>
+
+                    <form id="formCheckout" class="needs-validation" novalidate>
+                        <div class="row g-4">
+                            <!-- Columna Izquierda: Datos del cliente -->
+                            <div class="col-md-6">
+                                <h5 class="fw-bold text-dark mb-3 small text-uppercase tracking-wider">1. Datos de Envío
+                                </h5>
+                                <div class="mb-3">
+                                    <label for="pagoDireccion"
+                                        class="form-label fw-semibold text-dark small mb-1">Dirección de Envío</label>
+                                    <input type="text" id="pagoDireccion" class="form-control bg-light"
+                                        placeholder="Av. Larco 123, Miraflores, Lima"
+                                        th:value="${session.usuarioLogueado != null ? session.usuarioLogueado.direccion : ''}"
+                                        required readonly>
+                                    <div class="invalid-feedback">La dirección de envío es obligatoria.</div>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="pagoDepartamento"
+                                            class="form-label fw-semibold text-dark small mb-1">Departamento</label>
+                                        <input type="text" id="pagoDepartamento" class="form-control bg-light"
+                                            th:value="${session.usuarioLogueado != null ? session.usuarioLogueado.departamento : ''}"
+                                            readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="pagoProvincia"
+                                            class="form-label fw-semibold text-dark small mb-1">Provincia</label>
+                                        <input type="text" id="pagoProvincia" class="form-control bg-light"
+                                            th:value="${session.usuarioLogueado != null ? session.usuarioLogueado.provincia : ''}"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="pagoTelefono"
+                                            class="form-label fw-semibold text-dark small mb-1">Teléfono de Contacto</label>
+                                        <input type="tel" id="pagoTelefono" class="form-control bg-light"
+                                            placeholder="987654321"
+                                            th:value="${session.usuarioLogueado != null ? session.usuarioLogueado.telefono : ''}"
+                                            pattern="9[0-9]{8}" maxlength="9" readonly>
+                                        <div class="invalid-feedback">El teléfono debe tener 9 dígitos y empezar con 9.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="pagoDni"
+                                            class="form-label fw-semibold text-dark small mb-1">DNI</label>
+                                        <input type="text" id="pagoDni" class="form-control bg-light"
+                                            placeholder="12345678"
+                                            th:value="${session.usuarioLogueado != null ? session.usuarioLogueado.dni : ''}"
+                                            pattern="\d{8}" maxlength="8" readonly>
+                                        <div class="invalid-feedback">El DNI debe tener 8 dígitos.</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pagoNotas" class="form-label fw-semibold text-dark small mb-1">Notas del
+                                        Pedido (opcional)</label>
+                                    <textarea id="pagoNotas" class="form-control" rows="3"
+                                        placeholder="Ej. Tocar el timbre del segundo piso."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Columna Derecha: Tarjeta Yape -->
+                            <div class="col-md-6 d-flex flex-column justify-content-between">
+                                <div>
+                                    <!-- Bloque de Nota de Crédito -->
+                                    <h5 class="fw-bold text-dark mb-2 small text-uppercase tracking-wider">2. Nota de Crédito (Opcional)</h5>
+                                    <div class="mb-3 p-3 bg-light rounded border shadow-sm text-start" style="color: #000;">
+                                        <label for="inputNotaCredito" class="form-label fw-semibold text-dark small mb-1">¿Tienes una Nota de Crédito?</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" id="inputNotaCredito" class="form-control" placeholder="NC-XXXXXXXX-XXXX">
+                                            <button class="btn btn-dark fw-bold text-uppercase" type="button" id="btnAplicarNotaCredito">Aplicar</button>
+                                        </div>
+                                        <div id="nc-status-message" class="small mt-1 d-none"></div>
+                                    </div>
+
+                                    <div id="alert-pago-completo" class="alert alert-success border-0 shadow-sm mb-3 p-3 text-center d-none" style="color: #0f5132;">
+                                        <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                                        <h6 class="fw-bold text-dark mb-1">¡Pago Cubierto!</h6>
+                                        <p class="small text-muted mb-0">El total de tu pedido está 100% cubierto por la Nota de Crédito. No es necesario realizar ningún pago adicional.</p>
+                                    </div>
+                                    <h5 id="pago-instrucciones-titulo" class="fw-bold text-dark mb-3 small text-uppercase tracking-wider">3. Escanear
+                                        QR</h5>
+                                    <div id="qr-yape-container" class="bg-light p-3 rounded text-center border mb-0">
+                                        <span
+                                            class="d-block text-muted small fw-semibold text-uppercase tracking-wider mb-2">Código
+                                            QR Yape</span>
+                                        <img th:src="@{/images/Qr_yape.webp}"
+                                            class="img-fluid border shadow-sm mb-2 qr-zoomable"
+                                            style="max-height: 160px; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;"
+                                            alt="Código QR Yape" title="Click para ampliar">
+                                        <h6 class="fw-bold text-dark mb-1">Monto a Yapear: <span class="text-gold"
+                                                id="pago-total-monto">S/. 0.00</span></h6>
+                                        <p class="text-muted"
+                                            style="font-size: 0.72rem; line-height: 1.35; margin-top: 8px; margin-bottom: 0;">
+                                            1. Escanea el código QR desde tu app Yape.<br>
+                                            2. Transfiere el monto total de arriba.<br>
+                                            3. Toma captura al comprobante.<br>
+                                            4. Confirma el pedido abajo.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-success w-100 py-2.5 fw-bold shadow-sm"
+                                id="btn-confirmar-yape">
+                                <i class="fab fa-whatsapp me-2"></i>Confirmar Pedido y Enviar WhatsApp
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+/* Icono de error */
+.icon-error {
+    font-size: 5rem;
+}
+
+/* Código de error */
+.codigo-error {
+    font-size: 6rem;
+    font-weight: 700;
+    color: #1A1A1A;
+}
+
+/* Título de error */
+.titulo-error {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1A1A1A;
+}
+
+/* Mensaje de error */
+.mensaje-error {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+/* Botón principal */
+.btn-principal {
+    background-color: #D3AF37;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    padding: 10px 24px;
+}
+
+.btn-principal:hover {
+    background-color: #b8941f;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(211, 175, 55, 0.3);
+}
+
+/* Botón volver */
+.btn-outline-dark {
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    padding: 10px 24px;
+}
+
+.btn-outline-dark:hover {
+    background-color: #1A1A1A;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Detalles técnicos */
+.detalles-tecnicos {
+    font-size: 0.75rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+details summary::-webkit-details-marker {
+    color: #D3AF37;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .codigo-error {
+        font-size: 4rem;
+    }
+
+    .titulo-error {
+        font-size: 1.25rem;
+    }
+
+    .icon-error {
+        font-size: 3.5rem;
+    }
+
+    .btn-principal,
+    .btn-outline-dark {
+        padding: 8px 18px;
+        font-size: 0.9rem;
+    }
+}

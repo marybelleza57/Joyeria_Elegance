@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Mis Notas de Crédito', links=null)}"></head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar(active='inicio', tipo='publico')}"></div>
+
+    <main class="flex-grow-1 py-5">
+        <div class="container py-4">
+
+            <!-- Encabezado de la página -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-uppercase"
+                    style="font-family: 'Outfit', sans-serif; letter-spacing: 2px;">Mis Notas de Crédito</h1>
+                <div class="divisor-columna mx-auto"
+                    style="width: 60px; height: 3px; background-color: var(--color-oro, #D3AF37);"></div>
+                <p class="text-muted mt-2">Administra tus Notas de Crédito y saldo disponible para tus próximas compras.
+                </p>
+            </div>
+
+            <!-- Alertas de éxito y error -->
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                th:if="${mensajeExito != null}">
+                <i class="fas fa-check-circle me-2 text-success"></i>
+                <span th:text="${mensajeExito}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                th:if="${mensajeError != null}">
+                <i class="fas fa-exclamation-circle me-2 text-danger"></i>
+                <span th:text="${mensajeError}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="row g-4">
+                <!-- Barra Lateral de Opciones (Sidebar) -->
+                <aside class="col-lg-3">
+                    <div th:replace="~{fragments/cliente_sidebar :: sidebar(active='notas-credito')}"></div>
+                </aside>
+
+                <!-- Contenido de las Opciones -->
+                <section class="col-lg-9">
+                    <div class="card border-0 shadow-sm rounded-0">
+                        <div class="card-header bg-white border-bottom py-3 px-4">
+                            <h4 class="mb-0 fw-bold h5 text-dark text-uppercase tracking-wider"
+                                style="font-family: 'Outfit', sans-serif;">
+                                <i class="fas fa-wallet me-2 text-gold"></i> Notas de Crédito
+                            </h4>
+                        </div>
+                        <div class="card-body p-4 p-md-5 bg-white text-start">
+
+                            <!-- Saldo Total Disponible -->
+                            <div class="mb-5 p-4 rounded border shadow-sm"
+                                style="background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%); color: #fff; border-color: #333 !important;">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7 mb-3 mb-md-0">
+                                        <h5 class="fw-bold text-uppercase tracking-wider mb-2"
+                                            style="font-family: 'Outfit', sans-serif; color: var(--color-oro, #D3AF37);">
+                                            <i class="fas fa-coins me-2"></i> Saldo Elegance Disponible
+                                        </h5>
+                                        <p class="small text-white-50 mb-0">
+                                            Utiliza tus Notas de Crédito activas para comprar cualquier joya en nuestra
+                                            tienda online.
+                                            Ingresa el código durante el proceso de pago.
+                                        </p>
+                                    </div>
+                                    <div class="col-md-5 text-md-end">
+                                        <span class="d-block text-white-50 small text-uppercase tracking-widest mb-1">Tu
+                                            Saldo Total</span>
+                                        <h2 class="display-6 fw-bold mb-0" style="color: var(--color-oro, #D3AF37);"
+                                            th:text="'S/. ' + ${#numbers.formatDecimal(saldoTotal != null ? saldoTotal : 0.00, 1, 2)}">
+                                            S/. 0.00
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sin Notas de Crédito -->
+                            <div th:if="${#lists.isEmpty(notasCredito)}" class="text-center py-5">
+                                <div class="mb-3">
+                                    <i class="fas fa-receipt text-muted opacity-50" style="font-size: 4rem;"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-2">No tienes Notas de Crédito disponibles</h5>
+                                <p class="text-muted small mx-auto" style="max-width: 480px;">
+                                    Cuando realices una devolución aprobada, recibirás una Nota de Crédito que podrás
+                                    usar en tus próximas compras.
+                                </p>
+                                <a th:href="@{/catalogo}" class="btn btn-principal mt-3">
+                                    <i class="fas fa-shopping-bag me-2"></i> Ir al Catálogo
+                                </a>
+                            </div>
+
+                            <!-- Listado de Notas de Crédito -->
+                            <div th:if="${!#lists.isEmpty(notasCredito)}">
+                                <h5 class="fw-bold text-dark mb-3 text-uppercase tracking-wide"
+                                    style="font-family: 'Outfit', sans-serif;">
+                                    <i class="fas fa-list me-2 text-gold"></i> Historial de Notas de Crédito
+                                </h5>
+
+                                <div class="table-responsive">
+                                    <table class="table align-middle table-hover">
+                                        <thead class="table-light text-uppercase tracking-wider"
+                                            style="font-size: 0.78rem;">
+                                            <tr>
+                                                <th class="py-3 border-0">Código</th>
+                                                <th class="py-3 border-0">Fecha Emisión</th>
+                                                <th class="py-3 border-0">Pedido Origen</th>
+                                                <th class="py-3 border-0">Monto Inicial</th>
+                                                <th class="py-3 border-0">Saldo Disponible</th>
+                                                <th class="py-3 border-0">Estado</th>
+                                                <th class="py-3 border-0 text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="nc : ${notasCredito}">
+                                                <td class="py-3">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <code
+                                                            class="fw-bold px-2 py-1 bg-light border text-dark rounded"
+                                                            style="font-size: 0.9rem;" th:text="${nc.codigo}">
+                                                            NC-XXXXXX
+                                                        </code>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 text-muted"
+                                                    th:text="${#temporals.format(nc.fechaEmision, 'dd/MM/yyyy')}">
+                                                    01/01/2026
+                                                </td>
+                                                <td class="py-3 text-dark fw-semibold"
+                                                    th:text="${nc.pedidoOrigen != null ? nc.pedidoOrigen.numeroPedido : '-'}">
+                                                    PE-000020
+                                                </td>
+                                                <td class="py-3 text-muted"
+                                                    th:text="'S/. ' + ${#numbers.formatDecimal(nc.montoInicial, 1, 2)}">
+                                                    S/. 100.00
+                                                </td>
+                                                <td class="py-3 text-gold fw-bold"
+                                                    th:text="'S/. ' + ${#numbers.formatDecimal(nc.montoDisponible, 1, 2)}">
+                                                    S/. 100.00
+                                                </td>
+                                                <td class="py-3">
+                                                    <span class="badge rounded-pill text-uppercase px-2.5 py-1"
+                                                        style="font-size: 0.68rem; font-weight: 700;"
+                                                        th:classappend="${nc.estado == 'ACTIVO' ? 'bg-success text-white' : 
+                                                                           (nc.estado == 'USADO_PARCIAL' ? 'bg-info text-white' : 
+                                                                           (nc.estado == 'USADO_TOTAL' ? 'bg-secondary text-white' : 'bg-danger text-white'))}"
+                                                        th:text="${nc.estado == 'ACTIVO' ? 'Activo' : 
+                                                                   (nc.estado == 'USADO_PARCIAL' ? 'Parcial' : 
+                                                                   (nc.estado == 'USADO_TOTAL' ? 'Usado' : 'Expirado'))}">
+                                                        ACTIVO
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 text-center">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-dark px-3 py-1.5 fw-bold btn-copy-code"
+                                                        th:data-code="${nc.codigo}" title="Copiar código">
+                                                        <i class="far fa-copy me-1"></i> Copiar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Instrucciones de uso -->
+                                <div class="mt-4 p-4 bg-light border rounded">
+                                    <h6 class="fw-bold text-dark mb-2">
+                                        <i class="fas fa-info-circle text-gold me-2"></i> ¿Cómo usar tu Nota de Crédito?
+                                    </h6>
+                                    <ol class="text-muted small mb-0 ps-3">
+                                        <li>Selecciona las joyas que deseas comprar y agrégalas al carrito.</li>
+                                        <li>Durante el proceso de pago, busca el campo <strong>"Código de Nota de
+                                                Crédito"</strong>.</li>
+                                        <li>Ingresa el código de tu Nota de Crédito (ej:
+                                            <strong>NC-PE000020-ABCD</strong>).</li>
+                                        <li>El sistema validará el código y aplicará el descuento automáticamente.</li>
+                                        <li>¡Listo! El monto se descontará de tu saldo disponible.</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Modales -->
+    <div th:replace="~{fragments/modales :: modales}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Copiar código de Nota de Crédito al portapapeles
+            $('.btn-copy-code').on('click', function () {
+                const code = $(this).data('code');
+                if (!code) return;
+
+                // Usar navigator.clipboard si está disponible
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(code).then(() => {
+                        mostrarFeedbackCopiado($(this));
+                    }).catch(err => {
+                        fallbackCopiarTexto(code, $(this));
+                    });
+                } else {
+                    fallbackCopiarTexto(code, $(this));
+                }
+            });
+
+            function mostrarFeedbackCopiado(btn) {
+                const icon = btn.find('i');
+                const originalClass = icon.attr('class');
+                icon.attr('class', 'fas fa-check text-success me-1');
+                btn.html('<i class="fas fa-check text-success me-1"></i> ¡Copiado!');
+                setTimeout(() => {
+                    btn.html('<i class="far fa-copy me-1"></i> Copiar');
+                }, 3000);
+            }
+
+            function fallbackCopiarTexto(texto, btn) {
+                // Crear un input temporal
+                const input = document.createElement('input');
+                input.value = texto;
+                document.body.appendChild(input);
+                input.select();
+                try {
+                    document.execCommand('copy');
+                    mostrarFeedbackCopiado(btn);
+                } catch (err) {
+                    alert('No se pudo copiar el código. Por favor, cópialo manualmente: ' + texto);
+                }
+                document.body.removeChild(input);
+            }
+        });
+    </script>
+
+    <style>
+        /* Estilo del Sidebar Activo */
+        #settings-list .list-group-item {
+            color: var(--color-gris-oscuro, #4A4A4A);
+            background-color: #ffffff;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent !important;
+        }
+
+        #settings-list .list-group-item:hover {
+            background-color: #f8f9fa;
+            color: var(--color-oro, #D3AF37);
+        }
+
+        #settings-list .list-group-item.active {
+            background-color: #f8f9fa !important;
+            color: var(--color-oro, #D3AF37) !important;
+            border-left: 3px solid var(--color-oro, #D3AF37) !important;
+        }
+
+        .btn-principal {
+            background-color: var(--color-oro, #D3AF37) !important;
+            border-color: var(--color-oro, #D3AF37) !important;
+            color: #ffffff !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 10px 24px;
+            border-radius: 0px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-principal:hover,
+        .btn-principal:focus,
+        .btn-principal:active {
+            background-color: var(--color-negro-elegante, #1A1A1A) !important;
+            border-color: var(--color-negro-elegante, #1A1A1A) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .text-gold {
+            color: var(--color-oro, #D3AF37) !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+
+</body>
+
+</html>

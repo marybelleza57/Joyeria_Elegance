@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Panel Pedidos', links=~{::link})}">
+    <!-- Simple DataTables CSS -->
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.0.8/datatables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" rel="stylesheet">
+    <!-- Admin Custom CSS -->
+    <link th:href="@{/css/admin.css?v=10}" rel="stylesheet" type="text/css">
+</head>
+
+<body style="font-family: 'Inter', sans-serif; background-color: var(--color-claro);">
+
+    <!-- Topbar Admin -->
+    <nav th:replace="~{fragments/admin-components :: topbar}"></nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Admin -->
+            <nav th:replace="~{fragments/admin-components :: sidebar(activeTab='pedidos')}"></nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="admin-page-title">Gestión de Pedidos</h2>
+                </div>
+
+                <!-- Alertas de éxito y error -->
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                    th:if="${success != null}">
+                    <i class="fas fa-check-circle me-2 text-success"></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert"
+                    th:if="${error != null}">
+                    <i class="fas fa-exclamation-circle me-2 text-danger"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-4">
+                        <table class="table table-hover align-middle mb-0 datatable" id="tabla-pedidos">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 px-4 border-0">Pedido</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Fecha</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Cliente</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Total</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0"
+                                        style="min-width: 160px;">Estado</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 border-0">Dirección</th>
+                                    <th class="text-uppercase text-muted fw-bold small py-3 text-end px-4 border-0">
+                                        Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(pedidos)}">
+                                    <td colspan="7" class="text-center py-5 text-muted">No se han registrado pedidos en
+                                        el sistema.</td>
+                                </tr>
+                                <tr th:each="p : ${pedidos}">
+                                    <td class="px-4 fw-bold text-dark" th:text="${p.numeroPedido}">PE-000001</td>
+                                    <td class="text-muted small"
+                                        th:text="${#temporals.format(p.fechaCreacion, 'dd/MM/yyyy hh:mm a')}">12/07/2026
+                                        08:30 pm</td>
+                                    <td>
+                                        <div class="small fw-bold text-dark"
+                                            th:text="${p.cliente.nombres + ' ' + (p.cliente.apellidos != null ? p.cliente.apellidos : '')}">
+                                            Nombre Cliente</div>
+                                        <div class="small text-muted" th:text="${p.telefonoContacto}">999999999</div>
+                                    </td>
+                                    <td class="fw-bold text-gold"
+                                        th:text="'S/. ' + ${#numbers.formatDecimal(p.total, 1, 2)}">S/. 0.00</td>
+                                    <td>
+                                        <!-- Formulario para cambiar estado -->
+                                        <form th:action="@{/admin/pedidos/actualizar-estado}" method="POST"
+                                            class="m-0 select-estado-form">
+                                            <input type="hidden" name="id" th:value="${p.id}">
+                                            <input type="hidden" name="motivoCancelacion"
+                                                class="motivo-cancelacion-input" value="">
+                                            <select name="estado"
+                                                class="form-select form-select-sm rounded-3 border-secondary-subtle select-estado-pedido"
+                                                style="max-width: 150px; font-size: 0.85rem; font-weight: 600; padding: 4px 8px; cursor: pointer;"
+                                                th:classappend="${p.estado.name() == 'PENDIENTE' || p.estado.name() == 'DEV_SOLICITADA' ? 'bg-warning-subtle text-warning-focus' : (p.estado.name() == 'EN_TRANSITO' ? 'bg-info-subtle text-info-focus' : (p.estado.name() == 'CANCELADO' || p.estado.name() == 'DEV_RECHAZADA' ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'))}">
+                                                <option
+                                                    th:each="est : ${T(com.joyas.elegance.model.EstadoPedido).values()}"
+                                                    th:value="${est}" th:text="${est.name() == 'DEV_SOLICITADA' ? 'DEV_SOLICITADA' : (est.name() == 'DEV_APROBADA' ? 'DEV_APROBADA' : (est.name() == 'DEV_RECHAZADA' ? 'DEV_RECHAZADA' : est))}" th:selected="${est == p.estado}">
+                                                </option>
+                                            </select>
+                                            <div th:if="${p.estado.name() == 'CANCELADO' and p.motivoCancelacion != null}"
+                                                class="text-danger small fw-semibold mt-1"
+                                                style="font-size: 0.72rem; max-width: 150px; line-height: 1.2;">
+                                                Motivo: <span th:text="${p.motivoCancelacion}">Motivo</span>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td class="text-muted small" th:text="${p.direccionEnvio}">Dirección de envío</td>
+                                    <td class="text-end px-4">
+                                        <button
+                                            class="btn btn-sm btn-outline-dark rounded-3 px-3 py-1.5 fw-bold btn-ver-detalle-admin"
+                                            th:data-id="${p.id}">
+                                            <i class="fas fa-eye me-1"></i> Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div th:replace="~{fragments/modales :: modales}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.0.8/datatables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.min.js"></script>
+    <script th:src="@{/js/admin.js?v=10}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttonsDetalle = document.querySelectorAll(".btn-ver-detalle-admin");
+            const modalDetalle = new bootstrap.Modal(document.getElementById("modalDetallePedido"));
+
+            buttonsDetalle.forEach(button => {
+                button.addEventListener("click", function () {
+                    const pedidoId = this.getAttribute("data-id");
+                    if (!pedidoId) return;
+
+                    fetch(`/api/admin/pedidos/${pedidoId}/detalles`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("No se pudo cargar el detalle del pedido");
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Cargar datos generales
+                            document.getElementById("detalle-nro-pedido").textContent = data.numeroPedido;
+                            document.getElementById("detalle-fecha").textContent = data.fecha;
+
+                            // Estado badge styling
+                            const estadoBadge = document.getElementById("detalle-estado");
+                            let displayEstado = data.estado;
+                            if (data.estado === "DEV_SOLICITADA") displayEstado = "DEV. SOLICITADA";
+                            else if (data.estado === "DEV_APROBADA") displayEstado = "DEV. APROBADA";
+                            else if (data.estado === "DEV_RECHAZADA") displayEstado = "DEV. RECHAZADA";
+                            estadoBadge.textContent = displayEstado;
+
+                            estadoBadge.className = "badge px-2.5 py-1.5 rounded-pill";
+                            if (data.estado === "PENDIENTE" || data.estado === "DEV_SOLICITADA") {
+                                estadoBadge.classList.add("bg-warning", "text-dark");
+                            } else if (data.estado === "CANCELADO" || data.estado === "DEV_RECHAZADA") {
+                                estadoBadge.classList.add("bg-danger", "text-white");
+                            } else if (data.estado === "EN_TRANSITO") {
+                                estadoBadge.classList.add("bg-info", "text-white");
+                            } else {
+                                estadoBadge.classList.add("bg-success", "text-white");
+                            }
+
+                            // Banner para pedido en tránsito
+                            const transitoBanner = document.getElementById("detalle-transito-banner");
+                            if (transitoBanner) {
+                                if (data.estado === "EN_TRANSITO") {
+                                    transitoBanner.classList.remove("d-none");
+                                } else {
+                                    transitoBanner.classList.add("d-none");
+                                }
+                            }
+
+                            document.getElementById("detalle-direccion").textContent = data.direccionEnvio;
+                            const dniSpan = document.getElementById("detalle-dni");
+                            if (dniSpan) {
+                                dniSpan.textContent = data.dni || "-";
+                            }
+                            document.getElementById("detalle-telefono").textContent = data.telefonoContacto || "-";
+                            document.getElementById("detalle-notas").textContent = data.notas || "Ninguna";
+
+                            // Cargar Fecha de Entrega
+                            const entregaContainer = document.getElementById("detalle-entrega-container");
+                            const entregaSpan = document.getElementById("detalle-fecha-entrega");
+                            if (entregaContainer && entregaSpan) {
+                                if (data.fechaEntrega) {
+                                    entregaSpan.textContent = data.fechaEntrega;
+                                    entregaContainer.classList.remove("d-none");
+                                } else {
+                                    entregaSpan.textContent = "";
+                                    entregaContainer.classList.add("d-none");
+                                }
+                            }
+
+                            // Cargar Motivo de Cancelacion
+                            const cancelacionContainer = document.getElementById("detalle-cancelacion-container");
+                            const cancelacionSpan = document.getElementById("detalle-motivo-cancelacion");
+                            if (cancelacionContainer && cancelacionSpan) {
+                                if (data.estado === "CANCELADO" && data.motivoCancelacion) {
+                                    cancelacionSpan.textContent = data.motivoCancelacion;
+                                    cancelacionContainer.classList.remove("d-none");
+                                } else {
+                                    cancelacionSpan.textContent = "";
+                                    cancelacionContainer.classList.add("d-none");
+                                }
+                            }
+                            document.getElementById("detalle-cant-total").textContent = data.totalCantidad;
+                            document.getElementById("detalle-total-monto").textContent = `S/. ${parseFloat(data.total).toFixed(2)}`;
+
+                            // Llenar tabla de productos
+                            const tbody = document.getElementById("detalle-productos-tbody");
+                            tbody.innerHTML = "";
+
+                            data.items.forEach(item => {
+                                const tr = document.createElement("tr");
+
+                                // Celda de imagen
+                                const tdImagen = document.createElement("td");
+                                const img = document.createElement("img");
+                                img.src = item.imagen || "/images/no-image.png";
+                                img.alt = item.productoNombre;
+                                img.className = "rounded shadow-sm";
+                                img.style.width = "45px";
+                                img.style.height = "45px";
+                                img.style.objectFit = "cover";
+                                tdImagen.appendChild(img);
+
+                                // Celda de nombre
+                                const tdNombre = document.createElement("td");
+                                tdNombre.className = "fw-semibold text-dark small";
+                                tdNombre.textContent = item.productoNombre;
+
+                                // Celda de material
+                                const tdMaterial = document.createElement("td");
+                                tdMaterial.className = "text-muted small";
+                                tdMaterial.textContent = item.material || "-";
+
+                                // Celda de precio
+                                const tdPrecio = document.createElement("td");
+                                tdPrecio.className = "text-center text-dark small";
+                                tdPrecio.textContent = `S/. ${parseFloat(item.precioUnitario).toFixed(2)}`;
+
+                                // Celda de cantidad
+                                const tdCantidad = document.createElement("td");
+                                tdCantidad.className = "text-center text-muted small";
+                                tdCantidad.textContent = item.cantidad;
+
+                                // Celda de subtotal
+                                const tdSubtotal = document.createElement("td");
+                                tdSubtotal.className = "text-end fw-bold text-dark small";
+                                tdSubtotal.textContent = `S/. ${parseFloat(item.subtotal).toFixed(2)}`;
+
+                                tr.appendChild(tdImagen);
+                                tr.appendChild(tdNombre);
+                                tr.appendChild(tdMaterial);
+                                tr.appendChild(tdPrecio);
+                                tr.appendChild(tdCantidad);
+
+                                // Celda de devolución
+                                const tdDevolucion = document.createElement("td");
+                                tdDevolucion.className = "text-center small";
+                                if (item.estadoDevolucion === "DEV_SOLICITADA") {
+                                    tdDevolucion.innerHTML = '<span class="badge bg-warning text-dark px-2 py-1 rounded">Solicitada</span>';
+                                } else if (item.estadoDevolucion === "DEV_APROBADA") {
+                                    tdDevolucion.innerHTML = '<span class="badge bg-success text-white px-2 py-1 rounded">Aprobada</span>';
+                                } else if (item.estadoDevolucion === "DEV_RECHAZADA") {
+                                    tdDevolucion.innerHTML = '<span class="badge bg-danger text-white px-2 py-1 rounded">Rechazada</span>';
+                                } else {
+                                    tdDevolucion.innerHTML = '<span class="text-muted">-</span>';
+                                }
+                                tr.appendChild(tdDevolucion);
+                                tr.appendChild(tdSubtotal);
+
+                                tbody.appendChild(tr);
+                            });
+
+                            // Mostrar modal
+                            modalDetalle.show();
+                        })
+                        .catch(err => {
+                            alert(err.message);
+                        });
+                });
+            });
+
+            // Intercept select change for CANCELADO state
+            const selects = document.querySelectorAll(".select-estado-pedido");
+            selects.forEach(select => {
+                let previousValue = select.value;
+                select.addEventListener("focus", function () {
+                    previousValue = this.value;
+                });
+                select.addEventListener("change", function (e) {
+                    const form = this.closest("form");
+                    const value = this.value;
+                    if (value === "CANCELADO") {
+                        const modalEl = document.getElementById("modalCancelarPedido");
+                        const modal = new bootstrap.Modal(modalEl);
+
+                        const btnConfirmar = document.getElementById("btnConfirmarCancelacion");
+                        const selectMotivo = document.getElementById("cancelarMotivoSelect");
+                        const inputOtro = document.getElementById("cancelarMotivoOtro");
+                        const containerOtro = document.getElementById("cancelarMotivoOtroContainer");
+
+                        // Clear inputs
+                        selectMotivo.value = "Pago no realizado";
+                        inputOtro.value = "";
+                        containerOtro.classList.add("d-none");
+
+                        btnConfirmar.onclick = function () {
+                            let motivo = selectMotivo.value;
+                            if (motivo === "Otros") {
+                                motivo = inputOtro.value.trim() || "Otros";
+                            }
+                            form.querySelector(".motivo-cancelacion-input").value = motivo;
+                            form.submit();
+                        };
+
+                        // If modal is closed without confirmation, restore previous select value
+                        modalEl.addEventListener('hidden.bs.modal', function handler() {
+                            if (form.querySelector(".motivo-cancelacion-input").value === "") {
+                                select.value = previousValue;
+                            }
+                            modalEl.removeEventListener('hidden.bs.modal', handler);
+                        });
+
+                        modal.show();
+                    } else {
+                        form.submit();
+                    }
+                });
+            });
+
+            // Toggle custom reason input on select change in modal
+            const selectMotivo = document.getElementById("cancelarMotivoSelect");
+            const containerOtro = document.getElementById("cancelarMotivoOtroContainer");
+            if (selectMotivo && containerOtro) {
+                selectMotivo.addEventListener("change", function () {
+                    if (this.value === "Otros") {
+                        containerOtro.classList.remove("d-none");
+                        document.getElementById("cancelarMotivoOtro").focus();
+                    } else {
+                        containerOtro.classList.add("d-none");
+                    }
+                });
+            }
+        });
+    </script>
+
+    <style>
+        /* Clases auxiliares para colores de selects */
+        .text-warning-focus {
+            color: #856404 !important;
+        }
+
+        .bg-warning-subtle {
+            background-color: #fff3cd !important;
+        }
+
+        .bg-danger-subtle {
+            background-color: #f8d7da !important;
+        }
+
+        .bg-success-subtle {
+            background-color: #d1e7dd !important;
+        }
+
+        .text-info-focus {
+            color: #0c5460 !important;
+        }
+
+        .bg-info-subtle {
+            background-color: #d1ecf1 !important;
+        }
+    </style>
+    <!-- Modal Cancelar Pedido -->
+    <div class="modal fade" id="modalCancelarPedido" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalCancelarPedidoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark" id="modalCancelarPedidoLabel">Cancelar Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="text-muted small mb-4 text-start">Por favor, seleccione el motivo de la cancelación de
+                        este pedido. Esta acción no se puede deshacer.</p>
+
+                    <div class="mb-3 text-start">
+                        <label for="cancelarMotivoSelect" class="form-label fw-semibold text-dark small">Motivo de
+                            Cancelación</label>
+                        <select id="cancelarMotivoSelect" class="form-select rounded-3 border-secondary-subtle">
+                            <option value="Pago no realizado">Pago no realizado</option>
+                            <option value="Producto">Producto agotado</option>
+                            <option value="Cliente solicitó la cancelación">Cliente solicitó la cancelación</option>
+                            <option value="Datos de envío/contacto incorrectos">Datos de envío/contacto incorrectos
+                            </option>
+                            <option value="Otros">Otros (Especificar)</option>
+                        </select>
+                    </div>
+
+                    <div id="cancelarMotivoOtroContainer" class="mb-3 text-start d-none">
+                        <label for="cancelarMotivoOtro" class="form-label fw-semibold text-dark small">Especifique el
+                            motivo</label>
+                        <input type="text" id="cancelarMotivoOtro"
+                            class="form-control rounded-3 border-secondary-subtle"
+                            placeholder="Ej. Fuera de zona de entrega" maxlength="100">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-4 fw-semibold"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger rounded-3 px-4 fw-semibold"
+                        id="btnConfirmarCancelacion">Confirmar Cancelación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

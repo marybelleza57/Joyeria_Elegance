@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:fragment="modales">
+<head>
+    <!-- Cargar estilos CSS modulares para los modales -->
+    <link rel="stylesheet" th:href="@{/css/modales-validation.css}">
+</head>
+<body>
+
+    <!-- Inclusión de Modales Individuales -->
+    <div th:replace="~{fragments/modal_login :: modalLogin}"></div>
+    <div th:replace="~{fragments/modal_registro :: modalRegistro}"></div>
+    <div th:replace="~{fragments/modal_confirmar :: modalConfirmar}"></div>
+    <div th:replace="~{fragments/modal_carrito :: modalCarrito}"></div>
+    <div th:replace="~{fragments/modal_pago :: modalPago}"></div>
+    <div th:replace="~{fragments/modal_detalle_pedido :: modalDetallePedido}"></div>
+    <div th:replace="~{fragments/modal_completar_datos :: modalCompletarDatos}"></div>
+
+    <!-- Cargar script JS modular para validaciones de login y registro -->
+    <script th:src="@{/js/modales-login-registro.js}"></script>
+
+    <!-- Scripts de Thymeleaf para reabrir modales en caso de errores de autenticación -->
+    <script th:if="${errorLogin != null}">
+        document.addEventListener("DOMContentLoaded", function () {
+            const modalEl = document.getElementById('modalLogin');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+    </script>
+    <script th:if="${errorRegistro != null}">
+        document.addEventListener("DOMContentLoaded", function () {
+            const modalEl = document.getElementById('modalRegistro');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+    </script>
+
+    <span id="user-logged-in-state" 
+          th:data-logged="${session.usuarioLogueado != null}" 
+          th:data-completo="${session.usuarioLogueado != null 
+                             and session.usuarioLogueado.nombres != null and !#strings.isEmpty(session.usuarioLogueado.nombres) 
+                             and session.usuarioLogueado.apellidos != null and !#strings.isEmpty(session.usuarioLogueado.apellidos) 
+                             and session.usuarioLogueado.telefono != null and !#strings.isEmpty(session.usuarioLogueado.telefono) 
+                             and session.usuarioLogueado.dni != null and !#strings.isEmpty(session.usuarioLogueado.dni) 
+                             and session.usuarioLogueado.direccion != null and !#strings.isEmpty(session.usuarioLogueado.direccion) 
+                             and session.usuarioLogueado.departamento != null and !#strings.isEmpty(session.usuarioLogueado.departamento) 
+                             and session.usuarioLogueado.provincia != null and !#strings.isEmpty(session.usuarioLogueado.provincia)}"
+          style="display: none;"></span>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="modalRegistro" class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h4 class="modal-title fw-bold text-dark pt-2" style="font-family: 'Outfit', sans-serif;">Crear
+                        Cuenta</h4>
+                    <button type="button" class="btn-close me-1 mt-1" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3" style="width: 50px; height: 3px; background-color: var(--color-oro, #D3AF37);">
+                    </div>
+
+                    <!-- Alerta de Error de Registro -->
+                    <div class="alert alert-danger py-2 small mb-3" th:if="${errorRegistro != null}"
+                        th:text="${errorRegistro}"></div>
+
+                    <form id="formRegistroCliente" th:action="@{/cliente/registrar}" method="POST"
+                        class="needs-validation" novalidate>
+                        <!-- Campo Nombre -->
+                        <div class="mb-3">
+                            <label for="inputNombreCliente"
+                                class="form-label fw-semibold text-dark small mb-1">Nombre</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-user text-muted"></i></span>
+                                <input type="text" name="nombres" class="form-control bg-white" id="inputNombreCliente"
+                                    placeholder="Tu nombre" required style="border-color: #dee2e6;">
+                                <div class="invalid-feedback">El nombre es obligatorio.</div>
+                            </div>
+                        </div>
+                        <!-- Campo Apellidos -->
+                        <div class="mb-3">
+                            <label for="inputApellidosCliente"
+                                class="form-label fw-semibold text-dark small mb-1">Apellidos</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-user text-muted"></i></span>
+                                <input type="text" name="apellidos" class="form-control bg-white"
+                                    id="inputApellidosCliente" placeholder="Tu apellido" required
+                                    style="border-color: #dee2e6;">
+                                <div class="invalid-feedback">El apellido es obligatorio.</div>
+                            </div>
+                        </div>
+                        <!-- Campo Correo -->
+                        <div class="mb-3">
+                            <label for="inputEmailRegCliente" class="form-label fw-semibold text-dark small mb-1">Correo
+                                electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-envelope text-muted"></i></span>
+                                <input type="email" name="correo" class="form-control bg-white"
+                                    id="inputEmailRegCliente" placeholder="ejemplo@correo.com" required
+                                    style="border-color: #dee2e6;">
+                                <div class="invalid-feedback" id="emailRegClienteFeedback">Por favor, introduce un
+                                    correo válido.</div>
+                            </div>
+                        </div>
+                        <!-- Campo Teléfono -->
+                        <div class="mb-3">
+                            <label for="inputTelCliente"
+                                class="form-label fw-semibold text-dark small mb-1">Teléfono</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-phone text-muted"></i></span>
+                                <input type="tel" name="telefono" class="form-control bg-white" id="inputTelCliente"
+                                    placeholder="987654321" required pattern="9[0-9]{8}" maxlength="9"
+                                    style="border-color: #dee2e6;">
+                                <div class="invalid-feedback">El teléfono debe comenzar con 9 y tener 9 dígitos.</div>
+                            </div>
+                        </div>
+
+                        <!-- Campo Sexo (Género) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark small mb-1">
+                                Sexo
+                            </label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="genero" id="generoMasculino"
+                                        value="MASCULINO" required>
+                                    <label class="form-check-label text-dark small" for="generoMasculino">
+                                        <i class="fas fa-mars me-1 text-primary"></i> Masculino
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="genero" id="generoFemenino"
+                                        value="FEMENINO" required>
+                                    <label class="form-check-label text-dark small" for="generoFemenino">
+                                        <i class="fas fa-venus me-1 text-danger"></i> Femenino
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="genero"
+                                        id="generoPrefieroNoDecir" value="PREFIERO_NO_DECIR" required>
+                                    <label class="form-check-label text-dark small" for="generoPrefieroNoDecir">
+                                        <i class="fas fa-user me-1 text-muted"></i> Prefiero no decir
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback">Debes seleccionar tu sexo para continuar.</div>
+                        </div>
+
+                        <!-- Campo Contraseña -->
+                        <div class="mb-3">
+                            <label for="inputPasswordRegCliente"
+                                class="form-label fw-semibold text-dark small mb-1">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"
+                                    style="border-color: #dee2e6; width: 42px; display: flex; justify-content: center;"><i
+                                        class="fas fa-lock text-muted"></i></span>
+                                <input type="password" name="contrasena"
+                                    class="form-control bg-white border-start-0 border-end-0"
+                                    id="inputPasswordRegCliente" placeholder="••••••••" required
+                                    style="border-color: #dee2e6;">
+                                <button class="btn btn-outline-secondary border-start-0 bg-white" type="button"
+                                    id="togglePasswordRegCliente"
+                                    style="border-color: #dee2e6; color: #6c757d; border-radius: 0 0.375rem 0.375rem 0;">
+                                    <i class="fas fa-eye-slash" id="eyeIconRegCliente"></i>
+                                </button>
+                                <div class="invalid-feedback">La contraseña es obligatoria.</div>
+                            </div>
+                        </div>
+                        <!-- Acepto Términos y Condiciones -->
+                        <div class="mb-3 form-check text-start">
+                            <input type="checkbox" name="aceptaTerminos" class="form-check-input"
+                                id="inputAceptaTerminosCliente" required style="cursor: pointer;">
+                            <label class="form-check-label small text-muted" for="inputAceptaTerminosCliente"
+                                style="cursor: pointer; user-select: none;">
+                                Acepto los <a href="#" class="text-gold fw-bold text-decoration-none">términos y
+                                    condiciones</a> de Joyería Elegante
+                            </label>
+                            <div class="invalid-feedback" style="font-size: 0.75rem;">Debes aceptar los términos y
+                                condiciones para registrarte.</div>
+                        </div>
+                        <!-- Botón de Envío -->
+                        <button type="submit" class="btn btn-principal w-100 py-2.5 mt-2 shadow-sm">
+                            Registrarse <i class="fas fa-user-plus ms-2"></i>
+                        </button>
+                        <p class="text-center small text-muted mt-3 mb-0">¿Ya tienes cuenta? <a href="#"
+                                class="text-gold fw-bold text-decoration-none" data-bs-toggle="modal"
+                                data-bs-target="#modalLogin">Iniciar Sesión</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

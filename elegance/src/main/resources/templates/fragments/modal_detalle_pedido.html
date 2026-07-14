@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Modal Detalles del Pedido -->
+    <div th:fragment="modalDetallePedido" class="modal fade" id="modalDetallePedido" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h4 class="modal-title fw-bold text-dark pt-2" style="font-family: 'Outfit', sans-serif;">
+                        <i class="fas fa-receipt text-gold me-2"></i>Detalles del Pedido <span id="detalle-nro-pedido" class="text-gold"></span>
+                    </h4>
+                    <button type="button" class="btn-close me-1 mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-4" style="width: 50px; height: 3px; background-color: var(--color-oro, #D3AF37);"></div>
+                    
+                    <!-- Información General en 2 Columnas -->
+                    <div class="row g-3 mb-4 bg-light p-3 rounded border">
+                        <div class="col-sm-6">
+                            <p class="mb-1 text-muted small"><strong class="text-dark">Fecha de Compra:</strong> <span id="detalle-fecha"></span></p>
+                            <p class="mb-1 text-muted small"><strong class="text-dark">Estado:</strong> <span id="detalle-estado" class="badge"></span></p>
+                            <p class="mb-1 text-muted small"><strong class="text-dark">Método de Pago:</strong> <span id="detalle-metodo-pago">Yape</span></p>
+                            <p id="detalle-entrega-container" class="mb-1 text-muted small d-none"><strong class="text-dark">Fecha de Entrega:</strong> <span id="detalle-fecha-entrega"></span></p>
+                            <p id="detalle-cancelacion-container" class="mb-0 text-muted small d-none"><strong class="text-dark">Motivo de Cancelación:</strong> <span id="detalle-motivo-cancelacion" class="text-danger fw-semibold"></span></p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-1 text-muted small"><strong class="text-dark">Dirección de Envío:</strong> <span id="detalle-direccion"></span></p>
+                            <p class="mb-1 text-muted small"><strong class="text-dark">DNI:</strong> <span id="detalle-dni"></span></p>
+                            <p class="mb-1 text-muted small"><strong class="text-dark">Teléfono de Contacto:</strong> <span id="detalle-telefono"></span></p>
+                            <p class="mb-0 text-muted small"><strong class="text-dark">Notas:</strong> <span id="detalle-notas" class="fst-italic text-muted">Ninguna</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Banner de Pedido en Tránsito -->
+                    <div id="detalle-transito-banner" class="alert alert-info border-0 shadow-sm d-none mb-4 d-flex align-items-center gap-3" style="border-radius: 8px; background-color: #e0f7fa; border-left: 5px solid #00acc1 !important;">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-truck-moving fs-4 text-info"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-1 text-info small text-uppercase" style="letter-spacing: 0.5px;">Pedido en Tránsito</h6>
+                            <p class="mb-0 text-dark small" style="font-size: 0.8rem;">Tu pedido está en camino. El plazo estimado de entrega en tu dirección es de <strong>15 días hábiles</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Productos -->
+                    <h6 class="fw-bold text-dark mb-3 text-uppercase tracking-wider small"><i class="fas fa-gem me-2 text-gold"></i>Productos Adquiridos</h6>
+                    <div class="table-responsive mb-3" style="max-height: 250px; overflow-y: auto;">
+                        <table class="table align-middle">
+                            <thead class="table-light small text-uppercase tracking-wider">
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Producto</th>
+                                    <th>Material</th>
+                                    <th class="text-center">Precio</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-center">Devolución</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detalle-productos-tbody">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totales -->
+                    <div class="border-top pt-3 mt-3 d-flex flex-column align-items-end">
+                        <div class="d-flex justify-content-between w-100 max-w-300" style="max-width: 300px;">
+                            <span class="text-muted fw-semibold">Cantidad Total:</span>
+                            <span class="fw-bold text-dark" id="detalle-cant-total">0</span>
+                        </div>
+                        <div class="d-flex justify-content-between w-100 max-w-300 mt-1" style="max-width: 300px;">
+                            <span class="h5 fw-bold text-dark mb-0">Total General:</span>
+                            <span class="h5 fw-bold text-gold mb-0" id="detalle-total-monto">S/. 0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
+                    <button class="btn btn-outline-secondary px-4 fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

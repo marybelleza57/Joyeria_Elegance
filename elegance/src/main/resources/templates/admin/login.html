@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joyería Elegante | Acceso Administrativo</title>
+    <link rel="icon" type="image/webp" th:href="@{/favicon.webp}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin-login.css}">
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="text-center mb-4">
+            <h1 class="brand-header text-uppercase m-0">
+                <span style="color: #D3AF37;">Joyería</span> <span style="color: #FFFFFF;">Elegante</span>
+            </h1>
+            <div class="brand-subtitle mt-1">Acceso Administrativo</div>
+        </div>
+
+        <div class="card login-card p-4 p-md-5">
+
+            <div th:if="${error}" class="alert alert-custom alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${error}">Error al iniciar sesión</span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+            </div>
+
+            <div th:if="${mensaje}" class="alert alert-success-custom alert-dismissible fade show mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${mensaje}">Mensaje de éxito</span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+            </div>
+
+            <form th:action="@{/admin/login}" method="POST" class="needs-validation" novalidate>
+                <div class="mb-4">
+                    <label for="email" class="form-label mb-2">Correo Electrónico</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" th:value="${emailVal}">
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label for="contrasena" class="form-label mb-2">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="contrasena" name="contrasena"
+                            style="border-right: none;">
+                        <button class="btn btn-toggle-password" type="button" id="toggleContrasena">
+                            <i class="fas fa-eye-slash" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-end mb-4">
+                    <a th:href="@{/admin/olvide-contrasena}" class="link-forgot">
+                        <i class="fas fa-question-circle me-1"></i> ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-login">
+                        Ingresar <i class="fas fa-sign-in-alt ms-2"></i>
+                    </button>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a th:href="@{/}" class="back-link">
+                        <i class="fas fa-arrow-left me-1"></i> Volver a la Tienda
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/admin-login.js}"></script>
+</body>
+
+</html>

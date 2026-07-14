@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(title='Joyería Elegante | Olvidé mi Contraseña', links=null)}"></head>
+
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+    <div th:replace="~{fragments/navbar :: navbar(active='inicio', tipo='publico')}"></div>
+
+    <main class="flex-grow-1 py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-5">
+                            <h2 class="text-center mb-4 fw-bold">Olvidé mi Contraseña</h2>
+                            <p class="text-muted text-center mb-4">Ingresa tu correo electrónico y te enviaremos un
+                                enlace para restablecer tu contraseña.</p>
+
+                            <div class="alert alert-success" th:if="${mensaje != null}" th:text="${mensaje}"></div>
+                            <div class="alert alert-danger" th:if="${error != null}" th:text="${error}"></div>
+
+                            <form th:action="@{/cliente/olvide-contrasena}" method="POST">
+                                <div class="mb-3">
+                                    <label for="correo" class="form-label fw-semibold">Correo electrónico</label>
+                                    <input type="email" name="correo" id="correo" class="form-control"
+                                        placeholder="ejemplo@correo.com" required>
+                                </div>
+                                <button type="submit" class="btn btn-principal w-100 py-2">
+                                    Enviar enlace de recuperación
+                                </button>
+                            </form>
+
+                            <div class="text-center mt-4">
+                                <a th:href="@{/}" class="btn btn-outline-gold px-4 py-2">
+                                    <i class="fas fa-arrow-left me-2"></i> Volver al inicio
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/modales :: modales}"></div>
+
+    <style>
+        .btn-outline-gold {
+            color: #D3AF37;
+            border: 2px solid #D3AF37;
+            background-color: transparent;
+            border-radius: 0;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-outline-gold:hover {
+            background-color: #D3AF37;
+            color: #fff;
+            border-color: #D3AF37;
+        }
+
+        .btn-outline-gold:active {
+            transform: scale(0.98);
+        }
+    </style>
+
+</body>
+
+</html>
