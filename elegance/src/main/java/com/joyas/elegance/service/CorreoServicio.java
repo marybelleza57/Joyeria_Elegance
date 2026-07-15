@@ -1,16 +1,18 @@
 package com.joyas.elegance.service;
 
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import sendinblue.ApiClient;
 import sendinblue.ApiException;
 import sendinblue.Configuration;
 import sibApi.TransactionalEmailsApi;
 import sibModel.CreateSmtpEmail;
 import sibModel.SendSmtpEmail;
-import sibModel.SendSmtpEmailTo;
 import sibModel.SendSmtpEmailSender;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import java.util.Collections;
+import sibModel.SendSmtpEmailTo;
 
 @Service
 public class CorreoServicio {
@@ -23,6 +25,9 @@ public class CorreoServicio {
 
     @Value("${brevo.sender.name}")
     private String nombreRemitente;
+
+    @Value("${app.base.url}")
+    private String baseUrl;
 
     public void enviarCorreoRecuperacion(String destinatario, String nombre, String token) {
         try {
@@ -44,7 +49,7 @@ public class CorreoServicio {
 
             email.setSubject("Recuperación de Contraseña - Joyería Elegante");
 
-            String urlRecuperacion = "http://localhost:8080/cliente/restablecer-contrasena?token=" + token;
+            String urlRecuperacion = baseUrl + "/cliente/restablecer-contrasena?token=" + token;
 
             String contenidoHtml = "<html>" +
                     "<body style='font-family: Arial, sans-serif;'>" +
@@ -98,7 +103,7 @@ public class CorreoServicio {
 
             email.setSubject("Recuperación de Contraseña - Panel Administrador");
 
-            String urlRecuperacion = "http://localhost:8080/admin/restablecer-contrasena?token=" + token;
+            String urlRecuperacion = baseUrl + "/admin/restablecer-contrasena?token=" + token;
 
             String contenidoHtml = "<html>" +
                     "<body style='font-family: Arial, sans-serif;'>" +

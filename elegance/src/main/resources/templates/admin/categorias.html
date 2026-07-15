@@ -136,7 +136,7 @@
             document.getElementById('catNombre').value = '';
             document.getElementById('catDescripcion').value = '';
             document.getElementById('catEstado').value = 'ACTIVO';
-            new bootstrap.Modal(document.getElementById('modalCategor\u00eda')).show();
+            new bootstrap.Modal(document.getElementById('modalCategoria')).show();
         }
         function abrirModalEditarCategoria(btn) {
             document.getElementById('modalCategoriaTitle').innerText = 'Modificar Categoría';
@@ -145,7 +145,7 @@
             document.getElementById('catNombre').value = btn.getAttribute('data-nombre');
             document.getElementById('catDescripcion').value = btn.getAttribute('data-descripcion') || '';
             document.getElementById('catEstado').value = btn.getAttribute('data-estado') || 'ACTIVO';
-            new bootstrap.Modal(document.getElementById('modalCategor\u00eda')).show();
+            new bootstrap.Modal(document.getElementById('modalCategoria')).show();
         }
         function abrirModalEliminarCategoria(btn) {
             var catId = btn.getAttribute('data-id');
